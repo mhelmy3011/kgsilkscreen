@@ -98,22 +98,54 @@
   function setupDock() {
     const dock = document.getElementById('dock');
     if (!dock) return;
-    let last = 0;
-    const onScroll = () => {
-      const y = window.scrollY || 0;
-      const downs = y > 520;
-      const goingDown = y > last + 6;
-      // show it when the user is reading (scrolling down past the hero),
-      // hide it while they scroll up fast so it never covers content
-      const show = downs && (goingDown || y > last);
-      if (dock._show !== show) {
-        dock._show = show;
-        dock.style.setProperty('--show', show ? '1' : '0');
-      }
-      last = y;
+
+    // Show the bar once the reader is past the hero (which carries its own
+    // full-width WhatsApp button), and retract it when they scroll UP — a
+    // thumb-covering bar is fine while descending, wrong while re-reading.
+    //
+    // The original version retracted on ANY upward movement, so a 2px bounce
+    // made it flicker. Now the direction has to be deliberate: a 60px run, and
+    // a 12px hysteresis band so small reversals change nothing.
+    const SHOW_AFTER = 520;
+    const RUN = 60;
+    const DEADBAND = 12;
+
+    let lastY = window.scrollY || 0;
+    let anchorY = lastY;   // scroll position at the last direction change
+    let shown = false;
+
+    const apply = (next) => {
+      if (next === shown) return;
+      shown = next;
+      dock.style.setProperty('--show', next ? '1' : '0');
+      // keep it out of the a11y tree while it is hidden and off-screen
+      dock.setAttribute('aria-hidden', next ? 'false' : 'true');
+      dock.querySelectorAll('a').forEach((a) => {
+        if (next) a.removeAttribute('tabindex');
+        else a.setAttribute('tabindex', '-1');
+      });
     };
+
+    const onScroll = () => {
+      const y = Math.max(0, window.scrollY || 0);
+      const dy = y - lastY;
+
+      if (Math.abs(dy) < DEADBAND) return;      // ignore rubber-banding
+      lastY = y;
+
+      const movedSinceTurn = y - anchorY;
+      if (Math.abs(movedSinceTurn) >= RUN) {
+        // a deliberate run in one direction
+        apply(y > SHOW_AFTER && movedSinceTurn > 0);
+        anchorY = y;
+      } else if (y <= SHOW_AFTER) {
+        apply(false);                            // always hidden near the top
+        anchorY = y;
+      }
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    apply(false);
   }
 
   function setupActiveNav() {

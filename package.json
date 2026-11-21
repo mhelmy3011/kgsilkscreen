@@ -12,7 +12,7 @@
     "start": "node server.js",
     "dev": "NODE_ENV=development node --watch server.js",
     "export": "node scripts/export-static.js",
-    "test": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/test-hero.js && node scripts/test-quote.js && node scripts/smoke.js",
+    "test": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/check-contrast.js && node scripts/check-a11y.js && node scripts/test-hero.js && node scripts/test-quote.js && node scripts/smoke.js",
     "seo": "node scripts/inject-jsonld.js",
     "build": "node scripts/logo-mark.js && node scripts/logo-lockup.js && node scripts/inline-brand.js && node scripts/inject-contact.js && node scripts/inject-jsonld.js && node scripts/build-images.js && node scripts/minify-css.js && node scripts/ssg.js",
     "images": "node scripts/build-images.js",
@@ -21,7 +21,7 @@
     "ssg": "node scripts/ssg.js",
     "check": "node scripts/check-assets.js",
     "lint": "node scripts/lint-shaders.js",
-    "verify": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/lint-shaders.js && node scripts/smoke.js && node scripts/check-assets.js",
+    "verify": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/check-contrast.js && node scripts/check-a11y.js && node scripts/lint-shaders.js && node scripts/smoke.js && node scripts/check-assets.js",
     "budget": "node scripts/budget.js",
     "css": "node scripts/minify-css.js",
     "fonts": "node scripts/build-fonts.js",
@@ -31,7 +31,9 @@
     "test:hero": "node scripts/test-hero.js",
     "brand": "node scripts/inline-brand.js",
     "test:quote": "node scripts/test-quote.js",
-    "contact": "node scripts/inject-contact.js"
+    "contact": "node scripts/inject-contact.js",
+    "check:contrast": "node scripts/check-contrast.js",
+    "check:a11y": "node scripts/check-a11y.js"
   },
   "dependencies": {
     "compression": "^1.7.4",

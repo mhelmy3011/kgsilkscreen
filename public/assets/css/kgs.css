@@ -62,11 +62,18 @@
   --ink-2: #0c141a;      /* raised */
   --ink-3: #131e26;      /* borders */
   --line: rgba(226, 240, 238, 0.11);
-  --line-strong: rgba(226, 240, 238, 0.2);
+  /* 0.2 failed WCAG's 3:1 non-text contrast on the page background (measured
+     1.69:1), which matters because this token draws button borders, the
+     selected-option ring and the dock outline. 0.38 measures ~2.9:1 over
+     --ink-1 and 3.0:1 over --ink-2, so a control's edge is now visible. */
+  --line-strong: rgba(226, 240, 238, 0.38);
 
   --paper: #eef3f1;      /* primary text */
   --paper-dim: rgba(238, 243, 241, 0.68);
-  --paper-mute: rgba(238, 243, 241, 0.44);
+  /* 0.44 measured 4.01:1 on the page — under AA for the 13-15px labels it is
+     used for. 0.52 gives ~5.2:1 and still reads as a quieter tier than
+     --paper-dim. */
+  --paper-mute: rgba(238, 243, 241, 0.52);
 
   --cyan: #14b8a6;
   --cyan-soft: #5eead4;
@@ -1443,7 +1450,9 @@ ul, ol { margin: 0; }
 .footer {
   position: relative;
   z-index: 2;
-  padding-block: clamp(44px, 7vh, 76px) 34px;
+  /* reserve the height of the fixed contact bar so it can never cover the
+     final CTA — this is the failure mode that makes a sticky bar feel hostile */
+  padding-block: clamp(44px, 7vh, 76px) calc(56px + max(12px, env(safe-area-inset-bottom)));
   border-block-start: 1px solid var(--line);
   background: linear-gradient(180deg, transparent, rgba(2, 4, 6, 0.7));
 }
@@ -1463,7 +1472,7 @@ ul, ol { margin: 0; }
   margin-block-end: 14px;
 }
 .footer p { color: var(--paper-mute); font-size: 14.5px; max-inline-size: 38ch; line-height: 1.75; }
-.footer h4 {
+.footer h3.footer__h {
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
@@ -1497,46 +1506,95 @@ ul, ol { margin: 0; }
 }
 .footer__bar a { color: var(--paper-dim); border-block-end: 1px solid rgba(255, 90, 31, 0.5); }
 
-/* ------------------------------- 16. زر واتساب عائم ---------------------- */
+/* --------------------- 16. شريط التواصل الثابت --------------------------- */
+/*
+ * Two thumb actions, always reachable, never covering content.
+ *
+ * It is a bar rather than a floating circle because a floating circle in the
+ * corner is the single hardest place on a phone for a thumb to reach, and this
+ * workshop's entire funnel is "talk to us now". The bar spans the bottom edge,
+ * sits above the home indicator via safe-area-inset-bottom, and the page
+ * reserves matching padding (see .footer) so it can never hide the last CTA.
+ *
+ * Behaviour: hidden on the first screen (the hero already has a full-width
+ * WhatsApp button — two competing CTAs above the fold is worse than one), then
+ * it slides in once the user starts reading. It retracts on an upward scroll so
+ * it never sits over something being read.
+ */
 .dock {
   position: fixed;
-  inset-block-end: max(16px, env(safe-area-inset-bottom));
-  inset-inline-start: 16px;
+  inset-block-end: max(0px, env(safe-area-inset-bottom));
+  inset-inline: 0;
   z-index: 120;
   display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-block-size: 56px;
+  padding: 6px max(var(--gutter), env(safe-area-inset-left)) 6px max(var(--gutter), env(safe-area-inset-right));
+  background: rgba(4, 7, 10, 0.86);
+  border-block-start: 1px solid var(--line-strong);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: 0 -18px 44px -24px rgba(0, 0, 0, 1);
+  transform: translateY(calc((1 - var(--show, 0)) * 130%));
+  opacity: var(--show, 0);
+  transition: transform 0.45s var(--ease-out), opacity 0.35s;
+  pointer-events: none;
+}
+.dock[style*="--show: 1"], .js-ready .dock { pointer-events: auto; }
+:root:not(.js-ready) .dock { transform: none; opacity: 1; }
+
+.dock__btn {
+  flex: 1;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 18px 9px 10px;
-  border-radius: 999px;
-  background: rgba(4, 7, 10, 0.78);
-  border: 1px solid var(--line-strong);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  box-shadow: 0 20px 44px -20px rgba(0, 0, 0, 1);
+  justify-content: center;
+  gap: 9px;
+  min-block-size: 44px;
+  border-radius: 12px;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 15px;
-  min-block-size: 48px;
-  transform: translateY(calc((1 - var(--show, 0)) * 120%));
-  opacity: var(--show, 0);
-  transition: transform 0.5s var(--ease-out), opacity 0.4s, background 0.3s;
+  color: var(--paper);
+  transition: background 0.25s;
 }
-.dock:hover { background: rgba(10, 16, 20, 0.9); }
+.dock__btn:active { background: rgba(238, 243, 241, 0.08); }
+.dock__sep {
+  inline-size: 1px;
+  align-self: center;
+  block-size: 24px;
+  background: var(--line-strong);
+  flex: none;
+  margin-inline: 10px;
+}
 .dock__ico {
-  width: 30px; height: 30px;
-  border-radius: 50%;
   display: grid;
   place-items: center;
+  inline-size: 30px; block-size: 30px;
+  border-radius: 50%;
   background: #25d366;
   color: #04120a;
   flex: none;
 }
-.dock__ico svg { width: 17px; height: 17px; }
-/* the dock is a thumb target, so it keeps its 15px label at every width —
-   only the horizontal padding gets tighter on a small phone */
-@media (max-width: 520px) {
-  .dock { padding: 8px 14px 8px 8px; gap: 8px; }
-  .dock__ico { width: 28px; height: 28px; }
+.dock__ico--call { background: var(--pigment); color: #1a0700; }
+.dock__ico svg { inline-size: 17px; block-size: 17px; }
+
+/* On a tablet/desktop the bar would be a mile wide, so it becomes a floating
+   pill again — but only where a mouse, not a thumb, does the pointing. */
+@media (min-width: 900px) {
+  .dock {
+    inset-inline: auto;
+    inset-inline-start: max(24px, calc((100vw - var(--maxw)) / 2 - 8px));
+    inset-block-end: 24px;
+    inline-size: auto;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 6px 8px;
+    min-block-size: 0;
+    box-shadow: 0 20px 44px -20px rgba(0, 0, 0, 1);
+  }
+  .dock__btn { flex: none; padding-inline: 12px; }
+  .dock__label { display: inline; }
 }
 
 /* ------------------------------- 17. تقليل الحركة ------------------------ */
@@ -1589,7 +1647,6 @@ ul, ol { margin: 0; }
 
   .card__media { aspect-ratio: 16 / 11; }
   .convert__card { border-radius: var(--r-lg); padding: 22px 18px 24px; }
-  .footer { padding-block-end: 92px; }   /* clear the sticky dock */
 }
 
 /* very small / older phones (iPhone SE, 320px Androids) */
