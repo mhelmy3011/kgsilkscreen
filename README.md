@@ -15,13 +15,16 @@ npm run dev     # http://localhost:3000
 | الأمر | الوظيفة |
 |---|---|
 | `npm start` | تشغيل السيرفر (بورت `PORT` أو ٣٠٠٠) |
-| `npm run build` | بناء كامل: تصغير CSS → SSG → JSON-LD → `dist/` |
-| `npm run verify` | فحص الشيدر + اختبار السكرول العكسي + سلامة كل الأصول |
+| `npm run build` | بناء كامل بالترتيب الصح: شعار → رقم → JSON-LD → صور → CSS → SSG |
+| `npm run verify` | فحص الشعار + عقد الموبايل + الشيدر + السكرول العكسي + الأصول |
+| `npm run logo` | إعادة توليد العلامة والأقفال وحقنها في الصفحة |
+| `npm run check:logo` | قواعد الهوية: مفيش خط، مفيش stroke، مفيش transform |
+| `npm run check:mobile` | عقد الـ mobile-first (أحجام الخط، مساحات اللمس) |
 | `npm run budget` | قياس الوزن الحقيقي على السلك ومقارنته بالميزانية |
 | `npm run assets` | توليد الصور المتجاوبة + كارت المشاركة |
 | `npm run fonts` | نسخ الخطوط من node_modules إلى `public/assets/fonts` |
 | `npm run og` | إعادة رندر كارت المشاركة (يحتاج Python + HarfBuzz) |
-| `npm test` | اختبارات التشغيل والسكرول العكسي (بدون متصفح) |
+| `npm test` | الهوية + الموبايل + السلايدر + بنّاء العرض + السكرول العكسي (بدون متصفح) |
 
 ### الصفحات
 
@@ -203,33 +206,49 @@ document.documentElement.dataset.perf = 'canvas-off';
 
 ```
 server.js                      Express: brotli + كاش + MIME + /api/health
-data/business.js               مصدر بيانات النشاط (NAP) الوحيد
+data/business.js               مصدر بيانات النشاط (NAP) الوحيد — الرقم والعنوان
 public/
   home.html                    الصفحة النهائية (المصدر)
-  index.html                   محوّل لـ /home.html (يتكتب تلقائيًا من SSG)
-  hub.html                     صفحة المقارنة بين الاتجاهات
-  concept-{1,2,3}/             النماذج الأولية
-  assets/css/kgs.css           نظام التصميم (موثّق، مقسّم ٢٠ قسم)
+  _ssg/home.html               ناتج البناء (بيُخدّم على /)
+  hub.html                     صفحة المقارنة بين الاتجاهات (مرجع، مش جزء من الموقع)
+  concept-{1,2,3}/             النماذج الأولية (مرجع)
+  favicon.svg                  العلامة (The Pull)
+  icon-192.png · icon-512.png · icon-maskable-512.png · apple-touch-icon.png
+  assets/css/kgs.css           نظام التصميم (٢٠ قسم، mobile-first)
   assets/css/kgs.min.css       ناتج البناء
   assets/js/kgs-ink.js         الشيدر (WebGL + احتياطي)
   assets/js/kgs-engine.js      rAF واحد + حارس الأداء + الكشف
+  assets/js/kgs-hero.js        سلايدر الهيرو (٣ سلايدات، scroll-snap)
+  assets/js/kgs-quote.js       بنّاء عرض السعر (٣ لمسات → رسالة واتساب)
   assets/js/kgs-page.js        توصيل الصفحة + Web Vitals
-  assets/img/*.{avif,webp,jpg} صور متجاوبة (٦٤٠ / ١٠٢٤)
+  assets/img/*.{avif,webp,jpg} صور متجاوبة (حسب الاتجاه: ٣٦٠–١٠٨٠ / ٦٤٠–١٩٢٠)
   assets/fonts/*.woff2         Alexandria + IBM Plex Mono + Cairo
-  _ssg/home.html               ناتج الـ SSG (بيُخدّم على /)
 scripts/
+  logo-mark.js                 هندسة العلامة (أشكال مليانة فقط)
+  logo-lockup.js               الأقفال + طقم الأيقونات
+  inline-brand.js              حقن العلامة في النافبار والفوتر
+  check-logo.js                فحص قواعد الهوية (مفيش خط، مفيش stroke)
+  check-mobile.js              فحص عقد الـ mobile-first
+  extract-wordmark.py          تحويل «كمال جادو» لمسارات (HarfBuzz)
+  extract-descriptor.py        تحويل SILK SCREEN لمسارات
+  svgrender.py                 محرّك تنقيط SVG للتحقق (بدون cairo)
   build-fonts.js               نسخ الخطوط (+ --ttf للـ OG)
-  build-images.js              خط الصور المتجاوبة
-  og-image.py                  كارت المشاركة (HarfBuzz + FreeType)
+  build-images.js              خط الصور المتجاوبة + ميزانية أول شاشة
+  og-image.py                  كارت المشاركة (HarfBuzz + FreeType + العلامة)
   minify-css.js                تصغير CSS مع تحقق
-  ssg.js                       تثبيت HTML + critical CSS
+  ssg.js                       critical CSS + تصغير HTML + noscript
   inject-jsonld.js             توليد JSON-LD من data/business.js
+  inject-contact.js            حقن رقم الورشة من data/business.js
   export-static.js             بناء dist/
   lint-shaders.js              فحص GLSL + تطابق الـ uniforms
+  test-hero.js                 سلوك السلايدر (٣٢ فحص)
+  test-quote.js                سلوك بنّاء العرض (٢٩ فحص)
   smoke.js                     السكرول العكسي + أخطاء التشغيل
   check-assets.js              كل مرجع لازم يرجع 200 بنوع صح
-  budget.js                    ميزانية الوزن على السلك
-assets-src/img/*.png           مصادر الصور (١٧٨ ك.ب × ٧)
+  budget.js                    ميزانية الوزن على السلك (لكل أصل)
+assets-src/logo/*.svg          العلامة والأقفال (مصدر الهوية)
+assets-src/img/*.png           مصادر الصور
+assets-src/original/           الأصل غير المضغوط (مش داخل git)
 ```
 
 ---
@@ -245,7 +264,11 @@ npm run verify
 | `lint-shaders` | الشيدر متوازن، مفيش `smoothstep` معكوس (undefined behavior في GLSL)، كل uniform في JS موجود في الشيدر |
 | `smoke` | مفيش أخطاء JS، **كل قيمة حركة بترجع لنفسها عند السكرول العكسي**، احتياطي WebGL بيشتغل، الأرقام عربية |
 | `check-assets` | ٨٢ مرجع: مفيش ٤٠٤، ومفيش `content-type` غلط (ده اللي بيكسر الصور بصمت) |
-| `budget` | الوزن الحقيقي على السلك أقل من الميزانية، والـ HTML أقل من ٤٥ ك.ب |
+| `check-logo` | الهوية كلها مسارات مليانة: مفيش `<text>` ولا `<g>` ولا `stroke` ولا `transform`، وكل أيقونة بمقاسها الصح |
+| `check-mobile` | مفيش قاعدة `max-width` بتصغّر خط أو مساحة لمس، والخط الأساسي ≥ ١٦px، وكل هدف لمس ≥ ٤٤px، وصورة الهيرو مش مخفية على الموبايل |
+| `test-hero` | ٣ سلايدات: واحد بس نشط، `inert` على المخفي، النقط والأسهم والكيبورد بمنطق RTL، مفيش autoplay، صورة السلايد الأول عالية الأولوية والباقي lazy |
+| `test-quote` | ٣ لمسات → رسالة واتساب كاملة، الـ href بيتحدث صح، والتشفير بيرجع زي ما هو، ومفيش أي تخزين |
+| `budget` | الوزن الحقيقي على السلك أقل من الميزانية، **ولكل أصل حد أقصى**، وأول شاشة على الموبايل ≤ ١١٠ ك.ب |
 
 **اللي الاختبارات مش بتغطيه:** الرسم الفعلي للشيدر (محتاج GPU حقيقي) والـ Lighthouse
 (محتاج متصفح). الاتنين لازم يتعملوا على موبايل حقيقي بعد النشر.
