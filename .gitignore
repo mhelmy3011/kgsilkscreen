@@ -7,3 +7,9 @@ npm-debug.log*
 .env.*
 !.env.example
 dist/
+# build artefacts
+public/assets/css/kgs.min.css
+public/_ssg/
+public/assets/fonts/*.ttf
+assets-src/og.html
+assets-src/img/thumb-*.jpg

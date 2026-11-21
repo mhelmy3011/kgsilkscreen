@@ -26,6 +26,17 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const APP_VERSION = readVersion();
 
+// AVIF/WebP/woff2 are not in every mime table that ships with Node, and a wrong
+// content-type stops browsers from rendering the image at all.
+const MIME = {
+  '.avif': 'image/avif',
+  '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
+  '.svg': 'image/svg+xml',
+  '.webmanifest': 'application/manifest+json',
+};
+for (const [ext, type] of Object.entries(MIME)) express.static.mime.define({ [type]: [ext.replace('.', '')] });
+
 app.disable('x-powered-by');
 app.set('trust proxy', true);
 
@@ -50,6 +61,29 @@ app.use((req, res, next) => {
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   res.setHeader('X-App-Version', APP_VERSION);
   next();
+});
+
+/* ---------------------------------- routes -------------------------------- */
+
+// "/" → the pre-rendered landing page when the build exists, else the source.
+// Both are plain files on disk, so this costs one stat per request at most.
+const SSG_HOME = path.join(PUBLIC_DIR, '_ssg', 'home.html');
+app.get('/', (req, res, next) => {
+  const file = fs.existsSync(SSG_HOME) ? SSG_HOME : path.join(PUBLIC_DIR, 'home.html');
+  res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+  // 103 Early Hints / preload: the stylesheet the document actually references
+  const sheet = fs.existsSync(path.join(PUBLIC_DIR, 'assets', 'css', 'kgs.min.css'))
+    ? '/assets/css/kgs.min.css'
+    : '/assets/css/kgs.css';
+  res.setHeader(
+    'Link',
+    `<${sheet}>; rel=preload; as=style, </assets/fonts/alexandria-arabic-900-normal.woff2>; rel=preload; as=font; type=font/woff2; crossorigin`
+  );
+  fs.readFile(file, 'utf8', (err, html) => {
+    if (err) return next(err);
+    // res.send (not sendFile) so `compression` can brotli/gzip the document
+    res.type('text/html; charset=utf-8').send(html);
+  });
 });
 
 /* ---------------------------------- html ---------------------------------- */

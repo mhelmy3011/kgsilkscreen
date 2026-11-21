@@ -15,7 +15,7 @@
 const { JSDOM, VirtualConsole } = require('jsdom');
 
 const BASE = process.env.BASE || 'http://127.0.0.1:3000';
-const PAGES = ['/concept-1/', '/concept-2/', '/concept-3/', '/'];
+const PAGES = ['/', '/concept-1/', '/concept-2/', '/concept-3/', '/hub.html'];
 const VH = 900;
 const DOC_H = 14000;
 
@@ -99,12 +99,13 @@ const vars = (doc, sel) => [...doc.querySelectorAll(sel)].map((el) => el.style.g
       continue;
     }
 
-    if (path === '/') {
-      results.push(`✓ ${label} loaded · title="${doc.title.slice(0, 46)}" · cards=${doc.querySelectorAll('.acard').length}`);
+    const STATIC_PAGES = ['/hub.html'];
+    if (STATIC_PAGES.includes(path)) {
+      results.push(`✓ ${label} loaded · title="${doc.title.slice(0, 46)}"`);
       continue;
     }
 
-    const sel = '.reveal, .wipe, .rise';
+    const sel = path === '/' ? '[data-reveal]' : '.reveal, .wipe, .rise';
     scrollTo(win, 0);
     await sleep(120);
     const atTop = vars(doc, sel);
@@ -130,6 +131,18 @@ const vars = (doc, sel) => [...doc.querySelectorAll(sel)].map((el) => el.style.g
     const ranged = [...mid1, ...deep].every((v) => v !== '' && +v >= -0.001 && +v <= 1.001);
 
     // meters must stay a valid percentage
+    // production page: depth readout must be Arabic-Indic and in range,
+    // and the WebGL fallback must have kicked in without breaking the page
+    if (path === '/') {
+      const readout = doc.querySelector('[data-depth-readout]');
+      const v = readout ? readout.textContent : '';
+      const arabicOk = /^[٠-٩]+$/.test(v);
+      const fallback = doc.documentElement.classList.contains('ink-fallback');
+      const hasCanvasFallback = !doc.getElementById('ink-canvas') || doc.getElementById('ink-canvas').style.display === 'none' || fallback;
+      results.push(`      · depth readout "${v}" arabic=${arabicOk} · webgl fallback=${fallback} · canvas handled=${hasCanvasFallback}`);
+      if (!arabicOk && v !== '') failed++;
+    }
+
     const meterBad = [...doc.querySelectorAll('#inkLevel, #depthFill, #pageBar')].filter((m) => {
       const h = m.style.height || m.style.width;
       return h && !/^\d+(\.\d+)?%$/.test(h);

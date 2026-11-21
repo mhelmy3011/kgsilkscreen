@@ -1,0 +1,6 @@
+# keep generated binaries out of text diffs
+*.woff2 binary
+*.avif binary
+*.webp binary
+*.jpg binary
+*.png binary

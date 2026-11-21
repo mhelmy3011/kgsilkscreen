@@ -59,6 +59,21 @@ function walk(dir, acc = []) {
 rmrf(OUT);
 copyDir(SRC, OUT);
 
+/* Static hosting has no server to rewrite "/" → home.html, so the pre-rendered
+   document becomes index.html and the source stays as home.html (the loader
+   stub in public/index.html is a client-side redirect, which we don't want as
+   the real entry point here). */
+const SSG = path.join(OUT, '_ssg', 'home.html');
+const SSG_SRC = path.join(ROOT, 'public', '_ssg', 'home.html');
+if (fs.existsSync(SSG_SRC)) {
+  fs.copyFileSync(SSG_SRC, path.join(OUT, 'index.html'));
+  fs.copyFileSync(SSG_SRC, path.join(OUT, 'home.html'));
+  fs.rmSync(path.join(OUT, '_ssg'), { recursive: true, force: true });
+  console.log('[export] index.html = pre-rendered landing page (SSG)');
+} else {
+  console.warn('[export] no SSG build found — run `npm run ssg` first for the full page');
+}
+
 // Root .htaccess is kept in the repo root and must travel with the static build.
 const htaccess = path.join(ROOT, '.htaccess');
 if (fs.existsSync(htaccess)) fs.copyFileSync(htaccess, path.join(OUT, '.htaccess'));
