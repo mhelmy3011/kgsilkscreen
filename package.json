@@ -21,7 +21,7 @@
     "ssg": "node scripts/ssg.js",
     "check": "node scripts/check-assets.js",
     "lint": "node scripts/lint-shaders.js",
-    "verify": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/check-contrast.js && node scripts/check-a11y.js && node scripts/check-fonts.js && node scripts/lint-shaders.js && node scripts/smoke.js && node scripts/check-assets.js",
+    "verify": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/check-contrast.js && node scripts/check-a11y.js && node scripts/check-fonts.js && node scripts/check-firstview.js && node scripts/lint-shaders.js && node scripts/smoke.js && node scripts/check-assets.js",
     "budget": "node scripts/budget.js",
     "css": "node scripts/minify-css.js",
     "fonts": "node scripts/build-fonts.js",
@@ -35,7 +35,8 @@
     "check:contrast": "node scripts/check-contrast.js",
     "check:a11y": "node scripts/check-a11y.js",
     "check:deploy": "node scripts/export-static.js && node scripts/check-deploy.js",
-    "check:fonts": "node scripts/check-fonts.js"
+    "check:fonts": "node scripts/check-fonts.js",
+    "check:firstview": "node scripts/check-firstview.js"
   },
   "dependencies": {
     "compression": "^1.7.4",
