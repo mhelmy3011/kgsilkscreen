@@ -1056,7 +1056,20 @@ ul, ol { margin: 0; }
   color: var(--paper);
   transition: gap 0.3s;
 }
-.card__link::after { content: "←"; transition: transform 0.3s; }
+/* The arrow used to be the literal glyph "←" (U+2192), which no shipped font
+   subset contains — on a device without a fallback it renders as a tofu box.
+   A CSS-drawn chevron costs nothing, scales with the text, and cannot be
+   missing from a font. Rotated 45deg: in RTL "forward" points left. */
+.card__link::after {
+  content: "";
+  inline-size: 7px;
+  block-size: 7px;
+  border-inline-start: 1.6px solid currentColor;
+  border-block-start: 1.6px solid currentColor;
+  rotate: -45deg;
+  margin-inline-start: 2px;
+  transition: transform 0.3s, margin 0.3s;
+}
 .card:hover .card__link { gap: 10px; }
 .card__link:hover { color: var(--pigment-soft); }
 
