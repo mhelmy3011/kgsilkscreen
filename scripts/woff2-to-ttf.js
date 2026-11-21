@@ -1,23 +1,39 @@
 #!/usr/bin/env node
 'use strict';
 /**
- * One-off helper: decompress the subset .woff2 fonts to .ttf so the offline OG
- * renderer (HarfBuzz/FreeType via Python) can use them. The .ttf files are build
- * artefacts — they live in public/assets/fonts only so the script can find them,
- * and are ignored by git.
+ * woff2-to-ttf.js — decompresses the shipped subset .woff2 files to .ttf.
+ *
+ * Build-time only: the logo and OG renderers shape text with HarfBuzz, and
+ * HarfBuzz/FreeType here can only read TrueType/OpenType, not WOFF2. The .ttf
+ * files are artefacts and are git-ignored.
+ *
+ * Requires fontTools with brotli:  pip install fonttools brotli
+ * Usage: node scripts/woff2-to-ttf.js [subset-name ...]
  */
 const fs = require('node:fs');
 const path = require('node:path');
-const zlib = require('node:zlib');
+const { execFileSync } = require('node:child_process');
 
 const DIR = path.join(__dirname, '..', 'public', 'assets', 'fonts');
-let n = 0;
-for (const f of fs.readdirSync(DIR)) {
-  if (!f.endsWith('.woff2')) continue;
-  // woff2 uses brotli on the table directory; we don't reimplement the
-  // transform here, we just note that Python's fontTools does the conversion
-  // in `npm run og` prerequisites. This script exists to make that explicit.
-  n++;
+const only = process.argv.slice(2);
+const files = fs.readdirSync(DIR).filter((f) => f.endsWith('.woff2'));
+const targets = only.length
+  ? files.filter((f) => only.some((o) => f.startsWith(o)))
+  : files;
+
+let made = 0;
+for (const f of targets) {
+  const src = path.join(DIR, f);
+  const out = src.replace(/\.woff2$/, '.ttf');
+  if (fs.existsSync(out)) continue;
+  execFileSync('python3', ['-c', `
+import sys
+from fontTools.ttLib import TTFont
+f = TTFont(sys.argv[1])
+f.flavor = None
+f.save(sys.argv[2])
+`, src, out], { stdio: 'pipe' });
+  made++;
+  console.log(`[fonts] ${f} → ${path.basename(out)}`);
 }
-console.log(`[fonts] ${n} woff2 subset(s) in ${path.relative(process.cwd(), DIR)}`);
-console.log('[fonts] convert with: python3 -c "from fontTools.ttLib import TTFont; ..." — see scripts/og-image.py header');
+console.log(`[fonts] ${made} converted, ${targets.length - made} already present`);

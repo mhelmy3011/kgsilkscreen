@@ -310,17 +310,17 @@ ul, ol { margin: 0; }
   letter-spacing: -0.01em;
   white-space: nowrap;
 }
+/* The mark carries its own two-tone inks (ink stem + pigment blade), so it sits
+   directly on the page instead of inside a coloured tile — a badge behind it
+   would both muddy the blade colour and shrink the glyphs. */
 .nav__mark {
-  width: 34px; height: 34px;
-  border-radius: 10px;
+  width: 36px; height: 36px;
   display: grid;
   place-items: center;
-  background: linear-gradient(140deg, var(--pigment), #b8340a);
-  color: #14080315;
-  box-shadow: 0 8px 22px -10px rgba(255, 90, 31, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: var(--ink);
   flex: none;
 }
-.nav__mark svg { width: 18px; height: 18px; }
+.nav__mark svg { width: 36px; height: 36px; display: block; }
 .nav__brand span small {
   display: block;
   font-family: var(--font-mono);
