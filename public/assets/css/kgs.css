@@ -983,9 +983,14 @@ button { font: inherit; color: inherit; }
   background: var(--paper-2);
   box-shadow: var(--shadow-1);
   isolation: isolate;
-  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
-  transform-style: preserve-3d;
   transition: transform 0.32s var(--ease-out), box-shadow 0.5s var(--ease-out), border-color 0.35s;
+}
+/* only precise pointers get a transform layer at all: on touch the card stays
+   a flat, untransformed surface, so no extra compositing and no hover state */
+@media (hover: hover) and (pointer: fine) {
+  .card {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+  }
 }
 .card::before {
   content: "";
