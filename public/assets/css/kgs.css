@@ -163,16 +163,6 @@ ul, ol { margin: 0; }
   border-radius: 4px;
 }
 
-.visually-hidden {
-  position: absolute !important;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
 .skip-link {
   position: fixed;
   inset-block-start: 8px;
@@ -304,7 +294,6 @@ ul, ol { margin: 0; }
 .hero-in--3 { animation-delay: 0.34s; }
 .hero-in--4 { animation-delay: 0.48s; }
 .hero-in--5 { animation-delay: 0.62s; }
-.hero-in--6 { animation-delay: 0.76s; }
 .no-motion .hero-in { animation: none; }
 
 /* ------------------------------- 5. النافبار ------------------------------ */
@@ -510,23 +499,6 @@ ul, ol { margin: 0; }
   line-height: 1.7;
 }
 
-/* mono meta chip */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(238, 243, 241, 0.045);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  color: var(--paper-dim);
-  white-space: nowrap;
-}
-.chip--hot { border-color: rgba(255, 90, 31, 0.45); background: rgba(255, 90, 31, 0.12); color: #ffc2a3; }
-
 /* ------------------------------- 8. الهيرو ------------------------------- */
 /*
   MOBILE-FIRST — this is the rule the whole project is built around.
@@ -601,11 +573,14 @@ ul, ol { margin: 0; }
   object-fit: cover;
   /* portrait art is composed with its subject high, copy sits low */
   object-position: 50% 28%;
-  opacity: 0.66;
+  /* At 1.0: the photograph is the subject of the slide. Dimming the image AND
+     laying a scrim on it stacks two darkening passes — that is how it became a
+     black rectangle. The scrim alone does the work now. */
+  opacity: 1;
   transform: scale(1.06);
   transition: transform 8s var(--ease-out), opacity 1.2s ease;
 }
-.hero__slide.is-active .hero__art img { transform: scale(1); opacity: 0.78; }
+.hero__slide.is-active .hero__art img { transform: scale(1); opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .hero__art img, .hero__slide.is-active .hero__art img { transition: none; transform: none; }
 }
@@ -616,9 +591,22 @@ ul, ol { margin: 0; }
   position: absolute;
   inset: 0;
   z-index: -1;
+  /* Tuned by compositing the real first screen and sampling the scrim under
+     every glyph (scripts/preview-firstview.js). On a 390x844 phone the block
+     is bottom-aligned and ~50% tall: badge at the top, title, lede, a
+     full-width CTA, then the stats. So the shade has to be heavy from the
+     badge down and can only let go in the top ~28%, where the photograph is
+     the subject. An earlier version reached only 0.34 alpha at the title,
+     which measured 2.4:1 — the type was sitting on the photograph. */
   background:
-    linear-gradient(to top, var(--ink-1) 4%, rgba(7, 13, 18, 0.94) 26%, rgba(7, 13, 18, 0.62) 52%, rgba(7, 13, 18, 0.2) 78%, rgba(7, 13, 18, 0.42) 100%),
-    radial-gradient(120% 60% at 50% 100%, rgba(255, 90, 31, 0.14), transparent 70%);
+    linear-gradient(to top,
+      rgba(7, 13, 18, 0.93) 0%,
+      rgba(7, 13, 18, 0.90) 30%,
+      rgba(7, 13, 18, 0.84) 55%,
+      rgba(7, 13, 18, 0.68) 72%,
+      rgba(7, 13, 18, 0.40) 86%,
+      rgba(7, 13, 18, 0.34) 100%),
+    radial-gradient(120% 55% at 50% 100%, rgba(255, 90, 31, 0.12), transparent 70%);
 }
 
 .hero__inner {
@@ -829,7 +817,13 @@ ul, ol { margin: 0; }
     padding-block: calc(var(--nav-h) + 40px) clamp(60px, 9vh, 110px);
   }
   .hero__copy { max-inline-size: 46ch; }
-  .hero__title { font-size: clamp(4.4rem, 8.5vw, 7.5rem); line-height: 0.94; }
+  /* The brand name must stay on ONE line — the plan's slide-1 copy is
+     «كمال جادو» over «سلك سكرين», and a name that breaks mid-word reads as a
+     layout failure, not as styling. Measured with HarfBuzz in Alexandria 900:
+     «كمال جادو» is 4.03em wide, so the cap has to be
+     (46ch of body copy) / 4.03 ≈ 5.5rem — a 7.5rem cap needed 639px inside a
+     391-553px column and broke the name. */
+  .hero__title { font-size: clamp(3.6rem, 6.2vw, 5.5rem); line-height: 0.98; }
   .hero__title--h2 { font-size: clamp(3.4rem, 6.5vw, 5.6rem); }
   .hero__title .l2 { font-size: 0.42em; }
   .hero__lede { max-inline-size: 54ch; font-size: 1.08rem; }
@@ -837,9 +831,20 @@ ul, ol { margin: 0; }
   .hero__stat dt { font-size: 12px; }
   .hero__art img { object-position: 50% 42%; }
   .hero__shade {
+    /* desktop: copy sits in the right half (RTL), so the scrim is anchored to
+       the inline-start edge and the art stays clean on the other side. The copy
+       column is 46ch ≈ 553px at 1440, i.e. it still has type at ~50% of the
+       viewport width, so the release must not begin before ~64% — a thinner
+       scrim there measured 4.16:1 behind the lede. */
     background:
-      linear-gradient(to left, rgba(7, 13, 18, 0.97) 0%, rgba(7, 13, 18, 0.88) 32%, rgba(7, 13, 18, 0.35) 62%, rgba(7, 13, 18, 0.1) 100%),
-      linear-gradient(to top, rgba(7, 13, 18, 0.9), transparent 55%);
+      linear-gradient(to left,
+        rgba(7, 13, 18, 0.97) 0%,
+        rgba(7, 13, 18, 0.93) 30%,
+        rgba(7, 13, 18, 0.80) 52%,
+        rgba(7, 13, 18, 0.44) 70%,
+        rgba(7, 13, 18, 0.12) 88%,
+        rgba(7, 13, 18, 0.06) 100%),
+      linear-gradient(to top, rgba(7, 13, 18, 0.72), transparent 42%);
   }
   /* RTL desktop: copy on the right, art breathing on the left */
   .hero__copy { justify-items: start; }
@@ -1317,7 +1322,6 @@ ul, ol { margin: 0; }
   font-size: 16.5px;
   line-height: 1.7;
 }
-.convert__actions { display: grid; gap: 11px; }
 .convert__note {
   display: flex;
   align-items: center;
@@ -1687,6 +1691,16 @@ ul, ol { margin: 0; }
   .nav__brand span small { display: none; }
   .hero__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 12px; }
   .dock { inset-block-end: 12px; inset-inline-start: 12px; }
+}
+
+/* short portrait phones (~640-700px tall): the copy block would otherwise cover
+   three quarters of the hero, forcing a scrim so heavy the photograph vanishes.
+   The stats repeat in the sections below, so they are the right thing to drop. */
+@media (max-height: 700px) and (orientation: portrait) {
+  .hero__stats { display: none; }
+  .hero__badge { margin-block-end: 12px; }
+  .hero__lede { margin-block-start: 12px; }
+  .hero__cta { margin-block-start: 16px; }
 }
 
 /* landscape phone: 100svh would leave ~360px of height, so the hero relaxes
