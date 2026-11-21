@@ -32,8 +32,6 @@ const { execFileSync } = require('node:child_process');
 const ROOT = path.join(__dirname, '..');
 const SRC = path.join(ROOT, 'assets-src', 'img');
 const OUT = path.join(ROOT, 'public', 'assets', 'img');
-const ARCHIVE = path.join(ROOT, 'assets-src', 'original');
-
 const QUALITY = { avif: 32, webp: 72, jpg: 80 };
 
 /** width sets by orientation */
@@ -124,28 +122,49 @@ for (const file of sources) {
   console.log(`[images] ${name.padEnd(16)} ${kind.padEnd(9)} ${w}×${h} → ${widths.join(', ')}`);
 }
 
-/* Keep the repository small: PNG sources are ~2-2.5 MB each, and the delivery
-   cap is ~128 MB. Recompress in place to a visually lossless PNG, and park the
-   original outside git. */
+/* Keep the repository small: PNG sources are ~2-2.5 MB each.
+ *
+ * This step MUST be idempotent. An earlier version palette-reduced every source
+ * on every run, which (a) degraded the image a little further each build and
+ * (b) left the tree dirty after a no-op build. So it now only touches a source
+ * that is not already reduced, and it detects that from the file itself — a
+ * palette PNG has a single PLTE chunk — rather than from a side-car stamp that
+ * could go stale.
+ */
+const ARCHIVE = path.join(ROOT, 'assets-src', 'original');
+
+function isPalettePng(file) {
+  const fd = fs.openSync(file, 'r');
+  const buf = Buffer.alloc(64 * 1024);
+  const read = fs.readSync(fd, buf, 0, buf.length, 0);
+  fs.closeSync(fd);
+  return buf.slice(0, read).includes('PLTE');
+}
+
 fs.mkdirSync(ARCHIVE, { recursive: true });
 let saved = 0;
+let touched = 0;
 for (const file of sources) {
   const src = path.join(SRC, file);
   const before = fs.statSync(src).size;
-  if (before < 600 * 1024) continue;
+  if (before < 600 * 1024) continue;      // already small enough
+  if (isPalettePng(src)) continue;        // already reduced — leave it alone
+
   const orig = path.join(ARCHIVE, file);
   if (!fs.existsSync(orig)) fs.copyFileSync(src, orig);
+
   execFileSync('convert', [src, '-strip', '-define', 'png:compression-level=9',
     '-colors', '256', '-dither', 'FloydSteinberg', src + '.tmp.png']);
-  const after2 = fs.statSync(src + '.tmp.png').size;
-  if (after2 < before) {
+  const reduced = fs.statSync(src + '.tmp.png').size;
+  if (reduced < before) {
     fs.renameSync(src + '.tmp.png', src);
-    saved += before - after2;
+    saved += before - reduced;
+    touched++;
   } else {
     fs.unlinkSync(src + '.tmp.png');
   }
 }
-if (saved) console.log(`[images] sources recompressed · saved ${kb(saved)} in git`);
+if (touched) console.log(`[images] ${touched} source(s) reduced · saved ${(saved / 1024).toFixed(0)} KB in git`);
 
 fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify(manifest, null, 0));
 console.log(`[images] ${sources.length} sources → ${made} files · encoded total ${kb(after)} (all variants)`);
