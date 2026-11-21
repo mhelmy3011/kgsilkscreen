@@ -41,20 +41,47 @@ let html = fs.readFileSync(SRC, 'utf8');
 const css = fs.readFileSync(CSS, 'utf8');
 
 /* ------------------------- 1. split critical CSS -------------------------- */
-// Everything up to the "services" section is above the fold on a phone, plus
-// tokens/fonts/nav/hero. Splitting on section markers keeps this honest.
-const MARKERS = [
-  '/* ------------------------------- 9. الخدمات',
-  '/* ------------------------------- 10.',
-];
-let cut = css.length;
-for (const m of MARKERS) {
-  const i = css.indexOf(m);
-  if (i > 0) cut = Math.min(cut, i);
+/*
+ * The inline block is the render-blocking part of the document, so it has to
+ * earn every byte. It contains ONLY what can appear in the first viewport:
+ *
+ *   tokens · reset · fonts · motion primitives · nav · buttons · shared atoms
+ *   · hero (the 3-slide rail) · the sticky dock
+ *
+ * Everything below the fold — services, process, why, commitments, the quote
+ * builder, FAQ, footer, print — is deliberately NOT inlined. It loads with the
+ * cacheable stylesheet a moment later, which costs nothing perceptually because
+ * it is off-screen. Inlining it was costing ~5 KB of gzip on every page view,
+ * including a repeat visit that had the stylesheet cached already.
+ */
+const CRITICAL_START = '/* ------------------------------- 1. الخطوط';
+const DEFERRED_START = '/* ------------------------------- 9. الخدمات';
+const DOCK_START = '/* ------------------------------- 16. زر واتساب عائم';
+const TUNING_START = '/* ------------------------------- 17. تقليل الحركة';
+const PRINT_START = '/* ------------------------------- 18. طباعة';
+
+function slice(from, to) {
+  const a = css.indexOf(from);
+  const b = to ? css.indexOf(to) : css.length;
+  if (a < 0) return '';
+  return css.slice(a, b > a ? b : css.length);
 }
-// minify each half with the same, verified minifier
-const critical = minify(css.slice(0, cut));
-const deferred = css.slice(cut);
+
+/* The dock is `position: fixed` and visible on the first screen, so its rules
+   must be inline even though they sit near the end of the sheet. Same for the
+   reduced-motion and hover guards, which apply to inline rules. */
+const head = slice(CRITICAL_START, DEFERRED_START);          // 1-8  tokens, nav, hero
+const belowFold = slice(DEFERRED_START, DOCK_START);        // 9-15 off-screen sections
+const dock = slice(DOCK_START, TUNING_START);               // 16   fixed, on-screen
+const guards = slice(TUNING_START, PRINT_START);            // 17   reduced motion
+const rest = slice(TUNING_START);                            // 17-20 expansions
+
+const criticalSrc = head + dock + guards;
+/* Everything else, plus the reduced-motion block again so the deferred sheet
+   stands on its own even if the inline block is stripped by a proxy. */
+const deferred = css.slice(0, CSS.indexOf(CRITICAL_START)) + belowFold + rest;
+
+const critical = squeezeCss(minify(criticalSrc));
 
 /* ------------------------- 2. inject into the doc ------------------------- */
 /* The critical block is INLINED and the rest of the sheet loads with
@@ -84,6 +111,53 @@ html = html.replace('</head>', noscript + '\n</head>');
 // But make the "js-ready" class available immediately so reveals start hidden
 // only when JS is actually live (prevents a flash of un-animated content).
 html = html.replace('<body>', '<body>\n<script>document.documentElement.classList.add("js-pending");</script>');
+
+/* ------------------- 1a. minify the inline critical CSS harder ------------- */
+/*
+ * `minify()` is deliberately conservative (it protects data URIs, custom
+ * properties, nesting and font-family quotes) because it also processes the
+ * shipping stylesheet. For the inline block we can go further with two
+ * provably safe rewrites:
+ *
+ *   `0.5`  → `.5`      a leading zero is never required in CSS numbers
+ *   ` 0 0 ` → ` 0 0 `  already covered — box-shadow shorthand is untouched
+ *
+ * and, above all, gzip-friendly output: the browser only needs the bytes once.
+ */
+function squeezeCss(c) {
+  return c
+    .replace(/(^|[^\w.\-])0\.(\d)/g, '$1.$2')       // 0.5rem → .5rem
+    .replace(/;\}/g, '}')                              // final semicolon
+    .replace(/\s*([{};:,>])\s*/g, '$1')                // structural whitespace
+    .replace(/\s+/g, ' ');
+}
+
+/* ------------------------- 1b. collapse HTML whitespace ------------------ */
+/*
+ * The document is hand-authored with two-space indentation, which is 5.7 KB of
+ * the 70 KB uncompressed payload and survives gzip less well than it looks
+ * (long runs of repeated spaces are cheap, but the newlines between attributes
+ * are not). HTML is whitespace-insensitive *between* tags, so collapsing runs of
+ * whitespace to one space there is safe.
+ *
+ * Preformatted content is protected: <pre>, <textarea>, <script>, <style> and
+ * comments are lifted out, the rest is collapsed, and they are put back.
+ */
+function collapseHtml(src) {
+  const keep = [];
+  const stash = (m) => `\u0000${keep.push(m) - 1}\u0000`;
+  let out = src
+    .replace(/<!--(?!\[if)[\s\S]*?-->/g, stash)
+    .replace(/<(pre|textarea|script|style)\b[\s\S]*?<\/\1>/gi, stash);
+  out = out.replace(/>\s+</g, '><').replace(/\s{2,}/g, ' ');
+  // restore in reverse so indices stay valid
+  return out.replace(/\u0000(\d+)\u0000/g, (_, i) => keep[Number(i)]);
+}
+if (!process.env.KGS_NO_HTML_MINIFY) {
+  const before = html.length;
+  html = collapseHtml(html);
+  console.log(`[ssg] whitespace ${before} → ${html.length} bytes`);
+}
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 fs.writeFileSync(OUT, html);

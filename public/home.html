@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>كمال جادو للسلك سكرين | طباعة تيشيرتات ويونيفورم في أبو كبير، الشرقية</title>
 <meta name="description" content="ورشة كمال جادو للسلك سكرين في أبو كبير، محافظة الشرقية. طباعة يدوية على التيشيرتات واليونيفورم والأعلام والزجاج والكرتون. سعر نهائي قبل التنفيذ، بروفة على قطعة حقيقية، وتسليم ٢–٥ أيام. اتصل أو ابعت على واتساب." />
-<meta name="keywords" content="سلك سكرين, طباعة سلك سكرين, طباعة تيشيرتات, يونيفورم مدارس, طباعة على الزجاج, أبو كبير, الشرقية, الزقازيق, كمال جادو" />
 <link rel="canonical" href="https://kgsilkscreen.store/" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 <meta name="theme-color" content="#04070a" />
@@ -43,10 +42,20 @@
 
 <link rel="stylesheet" href="/assets/css/kgs.css" />
 
-<!-- LCP image: preloaded with the exact responsive sources the hero will pick -->
-<link rel="preload" as="image" href="/assets/img/hero-ink-1024.avif" imagesrcset="/assets/img/hero-ink-640.avif 640w, /assets/img/hero-ink-1024.avif 1024w" imagesizes="(max-width: 1039px) 1px, 40vw" type="image/avif" />
+<!-- LCP: slide 1's art. The srcset/sizes MUST match the hero <picture> exactly,
+     or the preload fetches a file the browser then declines to use — which is a
+     wasted round trip and the fastest way to lose an LCP budget on 4G. -->
+<link rel="preload" as="image" type="image/avif"
+      href="/assets/img/slide-1-pull-540.avif"
+      imagesrcset="/assets/img/slide-1-pull-360.avif 360w, /assets/img/slide-1-pull-540.avif 540w, /assets/img/slide-1-pull-720.avif 720w"
+      imagesizes="(max-width: 520px) 100vw, 540px" />
+<link rel="preload" as="image" type="image/avif" media="(min-width: 900px)"
+      href="/assets/img/slide-1-pull-720.avif" imagesrcset="/assets/img/slide-1-pull-720.avif 720w" imagesizes="540px" />
 </head>
 <body>
+<!-- icon sprite: the WhatsApp glyph appears on every CTA, so it is defined
+     once and referenced. Saves ~1.3 KB of the document budget. -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><symbol id="i-wa" viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s-.5-.2-.7.1-.8 1-1 1.2-.4.2-.7.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.5-.6.3-.5v-.5l-1-2.3c-.2-.5-.4-.5-.6-.5h-.6c-.2 0-.5.1-.8.4a3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 12.7 12.7 0 0 0 4.9 4.3 8.6 8.6 0 0 0 3.3.9 2.9 2.9 0 0 0 2.2-.8 2.6 2.6 0 0 0 .6-1.8c0-.2 0-.4-.2-.5M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2"/><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol></symbol></svg>
 
 <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
 
@@ -69,7 +78,7 @@
 <!-- ======================== النافبار ======================== -->
 <header class="nav" data-nav>
   <a class="nav__brand" href="#top" aria-label="كمال جادو سلك سكرين — الصفحة الرئيسية">
-    <span class="nav__mark" aria-hidden="true"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><g fill="#eef3f1"><path d="M9.4 10.4L15.2 10.4L15.2 37.4L9.4 37.4Z"/><path d="M16.3 26L23.3 18.9L19.8 15.4L12.7 22.4Z"/><path d="M44.2 24.2L44.5 25.8L44.6 27.4L44.3 29L43.7 30.5L42.9 31.9L41.8 33.1L40.5 34L39 34.7L37.4 35.1L35.8 35.2L34.2 35L32.7 34.4L31.3 33.6L30.1 32.5L29.1 31.2L28.4 29.8L27.9 28.2L27.8 26.6L28 25L28.5 23.5L29.3 22L30.3 20.8L31.6 19.8L33 19L34.6 18.6L36.2 18.4L37.8 18.6L39.4 19L38.1 22.2L37.2 21.9L36.2 21.8L35.2 21.9L34.3 22.2L33.5 22.6L32.7 23.2L32.1 24L31.6 24.8L31.3 25.7L31.2 26.7L31.3 27.7L31.5 28.6L32 29.4L32.5 30.2L33.3 30.9L34.1 31.3L35 31.7L36 31.8L36.9 31.8L37.9 31.5L38.7 31.1L39.5 30.5L40.2 29.8L40.7 29L41 28.1L41.2 27.2L41.2 26.2L41 25.3Z"/><path d="M36.8 25.3L41.8 25.3L41.8 28.3L36.8 28.3Z"/></g><g fill="#ff5a1f"><path d="M13.7 29.2L25.3 36.2L28 31.8L16.3 24.8Z"/></g></svg></span>
+    <span class="nav__mark" aria-hidden="true"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><g fill="#eef3f1"><path d="M9 10L15 10L15 37L9 37Z"/><path d="M16 26L23 19L20 15L13 22Z"/><path d="M44 24L45 26L45 27L44 29L44 31L43 32L42 33L40 34L39 35L37 35L36 35L34 35L33 34L31 34L30 33L29 31L28 30L28 28L28 27L28 25L28 23L29 22L30 21L32 20L33 19L35 19L36 18L38 19L39 19L38 22L37 22L36 22L35 22L34 22L33 23L33 23L32 24L32 25L31 26L31 27L31 28L32 29L32 29L33 30L33 31L34 31L35 32L36 32L37 32L38 32L39 31L40 31L40 30L41 29L41 28L41 27L41 26L41 25Z"/><path d="M37 25L42 25L42 28L37 28Z"/></g><g fill="#ff5a1f"><path d="M14 29L25 36L28 32L16 25Z"/></g></svg></span>
     <span>كمال جادو
       <small>Silk&nbsp;Screen</small>
     </span>
@@ -84,7 +93,7 @@
   </ul>
 
   <a class="btn btn--primary btn--sm nav__cta" href="https://wa.me/201000000000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%83%D9%85%D8%A7%D9%84%20%D8%AC%D8%A7%D8%AF%D9%88%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B9%D8%B1%D9%81%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B3%D9%84%D9%83%20%D8%B3%D9%83%D8%B1%D9%8A%D9%86" target="_blank" rel="noopener" data-cta="nav-whatsapp">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s-.5-.2-.7.1-.8 1-1 1.2-.4.2-.7.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.5-.6.3-.5v-.5l-1-2.3c-.2-.5-.4-.5-.6-.5h-.6c-.2 0-.5.1-.8.4a3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 12.7 12.7 0 0 0 4.9 4.3 8.6 8.6 0 0 0 3.3.9 2.9 2.9 0 0 0 2.2-.8 2.6 2.6 0 0 0 .6-1.8c0-.2 0-.4-.2-.5M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2"/></svg>
+    <svg aria-hidden="true"><use href="#i-wa"/></svg>
     اطلب عرض سعر
   </a>
   <span class="nav__progress" data-progress aria-hidden="true"></span>
@@ -125,7 +134,7 @@
 
           <div class="hero__cta hero-in hero-in--4">
             <a class="btn btn--primary btn--lg" href="https://wa.me/201000000000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%83%D9%85%D8%A7%D9%84%20%D8%AC%D8%A7%D8%AF%D9%88%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B9%D8%B1%D9%81%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B3%D9%84%D9%83%20%D8%B3%D9%83%D8%B1%D9%8A%D9%86" target="_blank" rel="noopener" data-cta="hero-whatsapp">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s-.5-.2-.7.1-.8 1-1 1.2-.4.2-.7.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.5-.6.3-.5v-.5l-1-2.3c-.2-.5-.4-.5-.6-.5h-.6c-.2 0-.5.1-.8.4a3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 12.7 12.7 0 0 0 4.9 4.3 8.6 8.6 0 0 0 3.3.9 2.9 2.9 0 0 0 2.2-.8 2.6 2.6 0 0 0 .6-1.8c0-.2 0-.4-.2-.5M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2"/></svg>
+              <svg aria-hidden="true"><use href="#i-wa"/></svg>
               اطلب عرض سعر على واتساب
             </a>
             <a class="btn btn--ghost btn--lg" href="#why">شوف الشغل</a>
@@ -219,7 +228,7 @@
 
           <div class="hero__cta">
             <a class="btn btn--primary btn--lg" href="https://wa.me/201000000000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%83%D9%85%D8%A7%D9%84%20%D8%AC%D8%A7%D8%AF%D9%88%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B9%D8%B1%D9%81%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B3%D9%84%D9%83%20%D8%B3%D9%83%D8%B1%D9%8A%D9%86" target="_blank" rel="noopener" data-cta="hero-whatsapp-2">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s-.5-.2-.7.1-.8 1-1 1.2-.4.2-.7.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.5-.6.3-.5v-.5l-1-2.3c-.2-.5-.4-.5-.6-.5h-.6c-.2 0-.5.1-.8.4a3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 12.7 12.7 0 0 0 4.9 4.3 8.6 8.6 0 0 0 3.3.9 2.9 2.9 0 0 0 2.2-.8 2.6 2.6 0 0 0 .6-1.8c0-.2 0-.4-.2-.5M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2"/></svg>
+              <svg aria-hidden="true"><use href="#i-wa"/></svg>
               واتساب فورًا
             </a>
             <a class="btn btn--ghost btn--lg" href="#services">كل الخدمات</a>
@@ -505,57 +514,49 @@
 <section class="section" id="quotes" aria-labelledby="quotes-title">
   <div class="wrap">
     <header class="section__head">
-      <p class="eyebrow" data-reveal="fade">آراء العملاء</p>
+      <p class="eyebrow" data-reveal="fade">اتفاق واضح قبل الشغل</p>
       <h2 class="section__title" id="quotes-title" data-reveal="rise">
-        ناس <em>رجعت تطلب تاني</em>
+        اللي <em>مكتوب</em> هو اللي بيتنفّذ
       </h2>
+      <p class="section__lede" data-reveal="fade">
+        مش بنكتب كلام عملاء مش حقيقيين عشان نعبّر عن ثقة. بدل «قالوا عننا»،
+        دي الشروط اللي بنلتزم بيها في كل أوردر — تقدر تسأل عليها قبل ما تدفع مليم.
+      </p>
     </header>
 
     <div class="quotes">
-      <blockquote class="quote" data-reveal="rise">
-        <div class="quote__stars" aria-label="٥ من ٥">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-        </div>
-        <p>«طبعنا ٦٠٠ يونيفورم لمدرسة في الزقازيق. الشعار طلع نضيف على الكحلي، والفاتورة كانت جاهزة قبل التسليم. اللي عجبني إن السعر ما اتغيرش.»</p>
+      <article class="quote" data-reveal="rise">
+        <span class="quote__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/><path d="M9 11h2"/></svg>
+        </span>
+        <h3 class="quote__title">السعر نهائي قبل التنفيذ</h3>
+        <p>عرض السعر بيوصلك مكتوب على واتساب: الكمية، المقاس، عدد الألوان، وميعاد التسليم. الرقم اللي توافق عليه هو اللي بتدفعه — مفيش «الخام زاد» بعد ما نبدأ.</p>
         <footer>
-          <span class="quote__av" aria-hidden="true">م</span>
-          <span class="quote__who"><b>م. أحمد الشافعي</b><span>مدرسة خاصة · الزقازيق</span></span>
+          <span class="quote__who"><span>الالتزام ٠١ · التسعير</span></span>
         </footer>
-      </blockquote>
+      </article>
 
-      <blockquote class="quote" data-reveal="rise">
-        <div class="quote__stars" aria-label="٥ من ٥">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-        </div>
-        <p>«برطمانات العسل بتاعتنا اتطبعت عند كمال جادو. الورنيش والغسيل مأثرش على الطبعة خالص بعد ٦ شهور. هعمل باقي الإنتاج عندهم.»</p>
+      <article class="quote" data-reveal="rise">
+        <span class="quote__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </span>
+        <h3 class="quote__title">بروفة قبل الكمية</h3>
+        <p>بنطبع على قطعة حقيقية من نفس الخامة قبل ما نكمل الطلب. لو اللون أو المقاس مش زي ما اتفقنا، بنعدّل على حسابنا — مش بنشحن ونقول «هو ده المتاح».</p>
         <footer>
-          <span class="quote__av" aria-hidden="true">ه</span>
-          <span class="quote__who"><b>هبة منصور</b><span>منتجات عسل · منيا القمح</span></span>
+          <span class="quote__who"><span>الالتزام ٠٢ · الجودة</span></span>
         </footer>
-      </blockquote>
+      </article>
 
-      <blockquote class="quote" data-reveal="rise">
-        <div class="quote__stars" aria-label="٥ من ٥">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.6 7 .8-5.2 4.7 1.4 7L12 17.6 5.8 21l1.4-7L2 9.4l7-.8z"/></svg>
-        </div>
-        <p>«طلبت ٥٠ تيشيرت لفريق كافيه قبل افتتاح بثلاث أيام. جم في يومين، والتغليف كان منظم وكل مقاس في كيس لوحده.»</p>
+      <article class="quote" data-reveal="rise">
+        <span class="quote__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        </span>
+        <h3 class="quote__title">الميعاد مكتوب ومحسوب</h3>
+        <p>التسليم من ٢ لـ ٥ أيام عمل حسب الكمية، واليوم بيتحدد في العرض. لو حصل تأخير من عندنا، بنقولك قبل الميعاد — مش بعد ما تفوّت الفرصة.</p>
         <footer>
-          <span class="quote__av" aria-hidden="true">ك</span>
-          <span class="quote__who"><b>كريم عبد الله</b><span>كافيه · أبو كبير</span></span>
+          <span class="quote__who"><span>الالتزام ٠٣ · المواعيد</span></span>
         </footer>
-      </blockquote>
+      </article>
     </div>
   </div>
 </section>
@@ -566,32 +567,74 @@
     <div class="convert__card" data-reveal="rise">
       <div>
         <p class="eyebrow eyebrow--warm">الخطوة الجاية</p>
-        <h2 id="contact-title">ابعت التصميم <em>وابدأ النهارده</em></h2>
+        <h2 id="contact-title">اختار ٣ حاجات <em>وابعتها جاهزة</em></h2>
         <p>
-          قولنا الكمية والخامة واللون. لو معاك ملف جاهز ابعته على واتساب،
-          ولو لسه بتفكر ابعته فكرة وإحنا نظبط الفصل اللوني معاك.
-          بنرد بسعر نهائي وميعاد تسليم <b>في نفس اليوم</b> من السبت للخميس.
+          مش محتاج تكتب رسالة طويلة. اختار نوع الشغل، الكمية، والميعاد —
+          وهنجهّز لك رسالة واتساب مكتوبة فيها كل اللي محتاجينه لعرض السعر.
         </p>
         <p class="convert__note">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <svg aria-hidden="true"><use href="#i-check"/></svg>
           مفيش دفع أونلاين — بنتفق على واتساب أو في الورشة
         </p>
       </div>
 
-      <div class="convert__actions">
-        <a class="btn btn--primary btn--lg btn--block" href="https://wa.me/201000000000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%83%D9%85%D8%A7%D9%84%20%D8%AC%D8%A7%D8%AF%D9%88%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B9%D8%B1%D9%81%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B3%D9%84%D9%83%20%D8%B3%D9%83%D8%B1%D9%8A%D9%86" target="_blank" rel="noopener" data-cta="convert-whatsapp">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s-.5-.2-.7.1-.8 1-1 1.2-.4.2-.7.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.5-.6.3-.5v-.5l-1-2.3c-.2-.5-.4-.5-.6-.5h-.6c-.2 0-.5.1-.8.4a3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 12.7 12.7 0 0 0 4.9 4.3 8.6 8.6 0 0 0 3.3.9 2.9 2.9 0 0 0 2.2-.8 2.6 2.6 0 0 0 .6-1.8c0-.2 0-.4-.2-.5M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2"/></svg>
-          واتساب — اطلب عرض سعر
-        </a>
-        <a class="btn btn--ghost btn--lg btn--block" href="tel:+201000000000" data-cta="convert-call">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2"/></svg>
-          اتصل: ٠١٠ ٠٠٠٠ ٠٠٠٠
-        </a>
-        <a class="btn btn--ghost btn--block" href="https://goo.gl/maps/abu-kabir-sharqia" target="_blank" rel="noopener" data-cta="convert-map">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-          الورشة على الخريطة — أبو كبير
-        </a>
-      </div>
+      <!-- ============================================================
+           بنّاء عرض السعر — ٣ خطوات، ٣ لمسات
+           ------------------------------------------------------------
+           Progressive enhancement by design: the markup below is a real
+           <form> with real links, so it works with JS disabled. The script
+           only *updates the href* of the WhatsApp button as choices are made.
+           No step is hidden behind JS, and a user who ignores it entirely
+           still lands on a working WhatsApp link.
+           ============================================================ -->
+      <form class="qb" data-quote-builder novalidate>
+        <fieldset class="qb__step">
+          <legend class="qb__legend"><span class="qb__n" aria-hidden="true">١</span> نوع الشغل</legend>
+          <div class="qb__opts">
+            <label class="qb__opt"><input type="radio" name="kind" value="تيشيرتات وميرش" checked /><span>تيشيرتات</span></label>
+            <label class="qb__opt"><input type="radio" name="kind" value="يونيفورم مدارس أو شركات" /><span>يونيفورم</span></label>
+            <label class="qb__opt"><input type="radio" name="kind" value="أعلام وبانرات" /><span>أعلام</span></label>
+            <label class="qb__opt"><input type="radio" name="kind" value="طباعة على الزجاج والبرطمانات" /><span>زجاج</span></label>
+            <label class="qb__opt"><input type="radio" name="kind" value="أكياس وعلب كرتون" /><span>كرتون</span></label>
+            <label class="qb__opt"><input type="radio" name="kind" value="أدوات دعائية وأقلام" /><span>أدوات</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="qb__step">
+          <legend class="qb__legend"><span class="qb__n" aria-hidden="true">٢</span> الكمية</legend>
+          <div class="qb__opts">
+            <label class="qb__opt"><input type="radio" name="qty" value="٢٥–٥٠ قطعة" checked /><span>٢٥–٥٠</span></label>
+            <label class="qb__opt"><input type="radio" name="qty" value="٥٠–١٠٠ قطعة" /><span>٥٠–١٠٠</span></label>
+            <label class="qb__opt"><input type="radio" name="qty" value="١٠٠–٥٠٠ قطعة" /><span>١٠٠–٥٠٠</span></label>
+            <label class="qb__opt"><input type="radio" name="qty" value="أكثر من ٥٠٠ قطعة" /><span>+٥٠٠</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="qb__step">
+          <legend class="qb__legend"><span class="qb__n" aria-hidden="true">٣</span> الميعاد</legend>
+          <div class="qb__opts">
+            <label class="qb__opt"><input type="radio" name="when" value="في أقرب وقت" checked /><span>بسرعة</span></label>
+            <label class="qb__opt"><input type="radio" name="when" value="خلال أسبوع" /><span>خلال أسبوع</span></label>
+            <label class="qb__opt"><input type="radio" name="when" value="مش مستعجل" /><span>مش مستعجل</span></label>
+          </div>
+        </fieldset>
+
+        <div class="qb__foot">
+          <p class="qb__summary" data-qb-summary aria-live="polite">
+            ٣ اختيارات جاهزة — اضغط واتساب وهتلاقي الرسالة مكتوبة.
+          </p>
+          <a class="btn btn--primary btn--lg btn--block" data-qb-send
+             href="https://wa.me/201000000000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%83%D9%85%D8%A7%D9%84%20%D8%AC%D8%A7%D8%AF%D9%88%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B9%D8%B1%D9%81%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B3%D9%84%D9%83%20%D8%B3%D9%83%D8%B1%D9%8A%D9%86"
+             target="_blank" rel="noopener" data-cta="convert-whatsapp">
+            <svg aria-hidden="true"><use href="#i-wa"/></svg>
+            ابعتها على واتساب
+          </a>
+          <a class="btn btn--ghost btn--block" href="tel:+201000000000" data-cta="convert-call">
+            <svg aria-hidden="true"><use href="#i-phone"/></svg>
+            اتصل: ٠١٠ ٠٠٠٠ ٠٠٠٠
+          </a>
+        </div>
+      </form>
     </div>
   </div>
 </section>
@@ -643,7 +686,7 @@
     <div class="footer__grid">
       <div>
         <div class="footer__brand">
-          <span class="nav__mark" aria-hidden="true"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M9.4 10.4L15.2 10.4L15.2 37.4L9.4 37.4Z" fill="currentColor"/><path d="M16.3 26L23.3 18.9L19.8 15.4L12.7 22.4Z" fill="currentColor"/><path d="M13.7 29.2L25.3 36.2L28 31.8L16.3 24.8Z" fill="currentColor"/><path d="M44.2 24.2L44.5 25.8L44.6 27.4L44.3 29L43.7 30.5L42.9 31.9L41.8 33.1L40.5 34L39 34.7L37.4 35.1L35.8 35.2L34.2 35L32.7 34.4L31.3 33.6L30.1 32.5L29.1 31.2L28.4 29.8L27.9 28.2L27.8 26.6L28 25L28.5 23.5L29.3 22L30.3 20.8L31.6 19.8L33 19L34.6 18.6L36.2 18.4L37.8 18.6L39.4 19L38.1 22.2L37.2 21.9L36.2 21.8L35.2 21.9L34.3 22.2L33.5 22.6L32.7 23.2L32.1 24L31.6 24.8L31.3 25.7L31.2 26.7L31.3 27.7L31.5 28.6L32 29.4L32.5 30.2L33.3 30.9L34.1 31.3L35 31.7L36 31.8L36.9 31.8L37.9 31.5L38.7 31.1L39.5 30.5L40.2 29.8L40.7 29L41 28.1L41.2 27.2L41.2 26.2L41 25.3Z" fill="currentColor"/><path d="M36.8 25.3L41.8 25.3L41.8 28.3L36.8 28.3Z" fill="currentColor"/></svg></span>
+          <span class="nav__mark" aria-hidden="true"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M9 10L15 10L15 37L9 37Z" fill="currentColor"/><path d="M16 26L23 19L20 15L13 22Z" fill="currentColor"/><path d="M14 29L25 36L28 32L16 25Z" fill="currentColor"/><path d="M44 24L45 26L45 27L44 29L44 31L43 32L42 33L40 34L39 35L37 35L36 35L34 35L33 34L31 34L30 33L29 31L28 30L28 28L28 27L28 25L28 23L29 22L30 21L32 20L33 19L35 19L36 18L38 19L39 19L38 22L37 22L36 22L35 22L34 22L33 23L33 23L32 24L32 25L31 26L31 27L31 28L32 29L32 29L33 30L33 31L34 31L35 32L36 32L37 32L38 32L39 31L40 31L40 30L41 29L41 28L41 27L41 26L41 25Z" fill="currentColor"/><path d="M37 25L42 25L42 28L37 28Z" fill="currentColor"/></svg></span>
           كمال جادو — سلك سكرين
         </div>
         <p>
@@ -683,10 +726,9 @@
       <span>© <span id="yr">٢٠٢٦</span> كمال جادو — سلك سكرين · كل الحقوق محفوظة</span>
       <span>
         <a href="/#services">خدماتنا</a> ·
-        <a href="/concept-1/">اتجاه ١</a> ·
-        <a href="/concept-2/">اتجاه ٢</a> ·
-        <a href="/concept-3/">اتجاه ٣</a> ·
-        <a href="/">صفحة المقارنة</a>
+        <a href="/#process">خط الإنتاج</a> ·
+        <a href="/#faq">الأسئلة</a> ·
+        <a href="/#contact">تواصل معانا</a>
       </span>
     </div>
   </div>
@@ -747,12 +789,6 @@
         { "@type": "Country", "name": "EG" }
       ],
       "sameAs": ["https://www.facebook.com/kgsilkscreen"],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "38",
-        "bestRating": "5"
-      },
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
         "name": "خدمات السلك سكرين",
@@ -826,6 +862,7 @@
 <script src="/assets/js/kgs-ink.js" defer></script>
 <script src="/assets/js/kgs-engine.js" defer></script>
 <script src="/assets/js/kgs-hero.js" defer></script>
+<script src="/assets/js/kgs-quote.js" defer></script>
 <script src="/assets/js/kgs-page.js" defer></script>
 </body>
 </html>

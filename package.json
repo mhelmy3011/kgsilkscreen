@@ -12,7 +12,7 @@
     "start": "node server.js",
     "dev": "NODE_ENV=development node --watch server.js",
     "export": "node scripts/export-static.js",
-    "test": "node scripts/smoke.js",
+    "test": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/test-hero.js && node scripts/test-quote.js && node scripts/smoke.js",
     "seo": "node scripts/inject-jsonld.js",
     "build": "node scripts/ssg.js && node scripts/inject-jsonld.js && node scripts/export-static.js",
     "images": "node scripts/build-images.js",
@@ -29,7 +29,8 @@
     "check:logo": "node scripts/check-logo.js",
     "check:mobile": "node scripts/check-mobile.js",
     "test:hero": "node scripts/test-hero.js",
-    "brand": "node scripts/inline-brand.js"
+    "brand": "node scripts/inline-brand.js",
+    "test:quote": "node scripts/test-quote.js"
   },
   "dependencies": {
     "compression": "^1.7.4",

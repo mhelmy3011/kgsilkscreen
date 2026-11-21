@@ -1187,12 +1187,15 @@ ul, ol { margin: 0; }
   flex: none;
 }
 
-/* ------------------------------- 12. آراء العملاء ------------------------ */
+/* --------------------- 12. الالتزامات (بدل الآراء) ---------------------- */
+/* Replaces the fabricated-testimonial block. Same visual rhythm, but each card
+   now states a commitment the workshop can be held to — which is both honest
+   and a stronger conversion argument than invented five-star praise. */
 .quotes {
   display: grid;
   gap: clamp(12px, 1.6vw, 18px);
   grid-template-columns: 1fr;
-  margin-block-start: clamp(30px, 5vh, 48px);
+  margin-block-start: clamp(28px, 5vh, 48px);
 }
 @media (min-width: 820px) { .quotes { grid-template-columns: repeat(3, 1fr); } }
 .quote {
@@ -1202,33 +1205,36 @@ ul, ol { margin: 0; }
   background: linear-gradient(170deg, rgba(238, 243, 241, 0.065), rgba(238, 243, 241, 0.01));
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
-.quote__stars { display: flex; gap: 3px; color: #ffc94d; }
-.quote__stars svg { width: 14px; height: 14px; }
-.quote p { font-size: 15.5px; line-height: 1.78; color: var(--paper); flex: 1; }
-.quote footer {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding-block-start: 13px;
-  border-block-start: 1px solid var(--line);
-}
-.quote__av {
-  width: 34px; height: 34px;
-  border-radius: 50%;
+.quote__ico {
   display: grid;
   place-items: center;
-  background: linear-gradient(140deg, rgba(20, 184, 166, 0.3), rgba(109, 74, 255, 0.28));
-  border: 1px solid var(--line-strong);
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 13px;
-  color: var(--paper);
-  flex: none;
+  inline-size: 40px; block-size: 40px;
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.13);
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  color: var(--cyan-soft);
 }
-.quote__who b { display: block; font-size: 13px; font-weight: 700; }
-.quote__who span { display: block; font-size: 13.5px; color: var(--paper-mute); }
+.quote__ico svg { inline-size: 19px; block-size: 19px; }
+.quote__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.35;
+}
+.quote p { font-size: 15.5px; line-height: 1.75; color: var(--paper-dim); flex: 1; }
+.quote footer {
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--line);
+}
+.quote__who span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--paper-mute);
+}
 
 /* ------------------------------- 13. الرقم/التحويل ----------------------- */
 .convert {
@@ -1286,6 +1292,105 @@ ul, ol { margin: 0; }
   margin-block-start: 4px;
 }
 .convert__note svg { width: 13px; height: 13px; color: #37e6a0; flex: none; }
+
+/* --------------------- 13b. بنّاء عرض السعر (٣ لمسات) ------------------- */
+/* Replaces a wall of prose + four equal buttons with three taps that produce a
+   pre-written WhatsApp message. Rules that make it work on a phone:
+     · the radio itself is the tap target (label wraps it) — 48px, no tiny dots
+     · 2 columns at 360px, 3 when there is room; never a horizontal scroller
+     · the summary is aria-live so a screen reader hears the choice confirmed */
+.qb {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+.qb__step {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+.qb__legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin-block-end: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--paper-mute);
+}
+.qb__n {
+  display: grid;
+  place-items: center;
+  inline-size: 20px; block-size: 20px;
+  border-radius: 50%;
+  background: rgba(255, 90, 31, 0.16);
+  border: 1px solid rgba(255, 90, 31, 0.4);
+  color: var(--pigment-soft);
+  font-size: 13px;
+  flex: none;
+}
+.qb__opts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+@media (min-width: 420px) { .qb__opts { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.qb__opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 48px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: rgba(238, 243, 241, 0.04);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+  -webkit-tap-highlight-color: transparent;
+}
+/* visually hidden but still focusable and announced */
+.qb__opt input {
+  position: absolute;
+  opacity: 0;
+  inline-size: 100%; block-size: 100%;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.qb__opt:has(input:checked) {
+  border-color: rgba(255, 90, 31, 0.75);
+  background: rgba(255, 90, 31, 0.14);
+  color: #ffd2bd;
+}
+.qb__opt:has(input:focus-visible) {
+  outline: 2px solid var(--cyan-soft);
+  outline-offset: 2px;
+}
+/* older browsers without :has still show state via the focus/hover path */
+.qb__opt:active { transform: scale(0.985); }
+@media (hover: hover) {
+  .qb__opt:hover { border-color: rgba(238, 243, 241, 0.34); }
+}
+
+.qb__foot { display: grid; gap: 10px; }
+.qb__summary {
+  margin: 0 0 2px;
+  padding: 11px 13px;
+  border-radius: var(--r-sm);
+  border: 1px dashed var(--line-strong);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--paper-dim);
+  background: rgba(4, 7, 10, 0.4);
+}
 
 /* ------------------------------- 14. الأسئلة ----------------------------- */
 .faq {

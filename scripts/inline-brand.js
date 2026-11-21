@@ -23,15 +23,15 @@ const ROOT = path.join(__dirname, '..');
 const HTML = path.join(ROOT, 'public', 'home.html');
 const MARK = path.join(ROOT, 'assets-src', 'logo', 'mark.svg');
 
-const round1 = (d) =>
-  d.replace(/-?\d+(?:\.\d+)?/g, (n) => {
-    const v = Number(n);
-    return String(Math.round(v * 10) / 10);
-  });
+// Integer precision at 36px. The mark is drawn in a 48-unit box and rendered
+// at 36-64px, so one unit is well under a device pixel; two decimals cost ~200
+// bytes of the document budget for detail that cannot survive rasterisation.
+const round0 = (d) =>
+  d.replace(/-?\d+(?:\.\d+)?/g, (n) => String(Math.round(Number(n))));
 
 const src = fs.readFileSync(MARK, 'utf8');
 const paths = [...src.matchAll(/<path d="([^"]+)" fill="([^"]+)"/g)].map((m) => ({
-  d: round1(m[1]),
+  d: round0(m[1]),
   fill: m[2],
 }));
 
