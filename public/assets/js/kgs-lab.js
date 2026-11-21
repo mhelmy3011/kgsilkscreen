@@ -1,66 +1,75 @@
 /* ==========================================================================
    kgs-lab.js — مختبر الخامات: CSS-3D material ring
    ---------------------------------------------------------------------------
-   Six photographs sit on a preserve-3d cylinder. Rotating the ring is ONE
-   transform on the rig; the cards never animate individually. That keeps the
-   whole section on the compositor and off the main thread.
+   Six photographs sit on a preserve-3d cylinder. Rotating the ring is one
+   rotateY on a single wrapper; the cards never animate individually. The spin
+   itself is handed to the compositor by CSS transition, so this file owns no
+   animation loop, no rAF pump and no scroll sampling.
 
    What this file owns:
-     · spin     — target angle, driven by drag / buttons / chips, smoothed
-     · tilt     — small pointer-driven X/Y, hover devices only
-     · drift    — a few degrees tied to the section's progress through the view
-     · caption  — name + spec mirrored into an aria-live region
+     · spin   — target angle, from drag / buttons / chips → one custom property
+     · tilt   — a few degrees of pointer parallax, precise pointers only
+     · caption — name + spec mirrored into an aria-live region
 
    Rules it obeys:
-     · no loop until the section is actually visible (IntersectionObserver)
-     · no loop at all without preserve-3d → the CSS grid fallback stays
-     · prefers-reduced-motion → every change is instant, no drift, no tilt
-     · vertical scroll is never captured: touch-action is pan-y and we only
-       take over horizontal pointer movement.
+     · no loop at all: drag writes --spin directly, CSS eases it; tilt is
+       coalesced into at most one rAF per pointer burst
+     · without preserve-3d nothing is promoted and the CSS grid fallback stands
+     · prefers-reduced-motion / Save-Data → no tilt, instant spin (CSS handles
+       the reduced-motion transition kill switch)
+     · vertical scroll is never captured (touch-action: pan-y); only horizontal
+       pointer travel turns the ring
    ========================================================================== */
 (() => {
   'use strict';
 
-  const KGS = (window.KGS = window.KGS || {});
   const viewport = document.querySelector('[data-lab]');
   if (!viewport) return;
 
   const section = viewport.closest('.lab') || viewport;
-  const rig = viewport.querySelector('[data-lab-rig]');
+  const spin = viewport.querySelector('[data-lab-spin]');
+  const tiltEl = viewport.querySelector('[data-lab-tilt]');
   const cards = [...viewport.querySelectorAll('[data-lab-card]')];
   const chips = [...document.querySelectorAll('[data-lab-goto]')];
   const prev = document.querySelector('[data-lab-prev]');
   const next = document.querySelector('[data-lab-next]');
   const readName = document.querySelector('[data-lab-read]');
   const readSpec = document.querySelector('[data-lab-spec]');
-  if (!rig || cards.length < 2) return;
+  if (!spin || cards.length < 2) return;
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const hover = window.matchMedia('(hover: hover)').matches;
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const conn = navigator.connection || {};
+  const saveData = Boolean(conn.saveData) || /2g/.test(conn.effectiveType || '');
+  const raf = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
+
   const N = cards.length;
   const STEP = 360 / N;
   const meta = cards.map((c) => ({ name: c.dataset.name || '', spec: c.dataset.spec || '' }));
 
   const supports3d = (() => {
     try {
-      return window.CSS && CSS.supports && CSS.supports('transform-style', 'preserve-3d');
+      return Boolean(window.CSS && CSS.supports && CSS.supports('transform-style', 'preserve-3d'));
     } catch {
       return false;
     }
   })();
 
-  let target = 0;          // requested angle (deg)
-  let shown = 0;           // smoothed angle
-  let tiltX = 0;
-  let tiltY = 0;
+  let target = 0;       // requested ring angle, degrees
   let index = 0;
-  let visible = false;
-  let running = false;
-  let raf = 0;
-  let last = 0;
-  let drift = 0;
+  let shownSpin = null; // last value written, so style is not dirtied twice
+  let shownRx = null;
+  let shownRy = null;
 
   /* ---------------------------- caption ---------------------------------- */
+  function paintDepth(front) {
+    cards.forEach((card, k) => {
+      let d = Math.abs(k - front);
+      d = Math.min(d, N - d);
+      card.style.setProperty('--dim', d === 0 ? '0' : Math.min(0.52, 0.16 + d * 0.11).toFixed(2));
+    });
+  }
+
   function paintIndex() {
     const i = ((Math.round(-target / STEP) % N) + N) % N;
     if (i === index) return;
@@ -72,97 +81,52 @@
     paintDepth(i);
   }
 
-  /* dim cards by how far they are from the front. Opacity only: one property,
-     on the compositor, updated when the index changes — never per frame. */
-  function paintDepth(front) {
-    cards.forEach((card, k) => {
-      let d = Math.abs(k - front);
-      d = Math.min(d, N - d);
-      card.style.setProperty('--dim', d === 0 ? '0' : Math.min(0.55, 0.18 + d * 0.12).toFixed(2));
+  /* ------------------------------ spin ----------------------------------- */
+  /* One property, one wrapper. The transition lives in CSS, so a click or a
+     drag release is a single style recalc and the compositor does the easing. */
+  function setSpin(deg) {
+    const v = Math.round(deg * 100) / 100;
+    if (v === shownSpin) return;
+    shownSpin = v;
+    spin.style.setProperty('--spin', v.toFixed(2) + 'deg');
+  }
+
+  function goTo(i) {
+    target = -i * STEP;
+    setSpin(target);
+    paintIndex();
+  }
+
+  /* ------------------------------ tilt ----------------------------------- */
+  function writeTilt(rx, ry) {
+    if (!tiltEl) return;
+    if (rx !== shownRx) {
+      shownRx = rx;
+      tiltEl.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+    }
+    if (ry !== shownRy) {
+      shownRy = ry;
+      tiltEl.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+    }
+  }
+
+  let tiltQueued = false;
+  let tiltX = 0;
+  let tiltY = 0;
+
+  function queueTilt() {
+    if (tiltQueued) return;
+    tiltQueued = true;
+    raf(() => {
+      tiltQueued = false;
+      writeTilt(tiltX, tiltY);
     });
   }
 
-  function goTo(i, { snap = false } = {}) {
-    target = -i * STEP;
-    if (snap) target = Math.round(target / STEP) * STEP;
-    paintIndex();
-    ensureLoop();
-  }
-
-  /* ------------------------------ loop ----------------------------------- */
-  /*
-   * On this page kgs-engine.js already owns the single rAF loop, so the ring
-   * subscribes to it (KGS.engine.addFrame) and does no scheduling of its own.
-   * The fallback below only exists if the engine failed to load.
-   */
-  let lastRy = NaN;
-  let lastRx = NaN;
-
-  function apply() {
-    const ry = Math.round((shown + drift + tiltY) * 100) / 100;
-    const rx = Math.round(tiltX * 100) / 100;
-    // Writing a custom property invalidates style even when the value is
-    // identical. The section can sit on screen for minutes while the reader
-    // reads the cards, so only touch the DOM when the numbers actually moved.
-    if (ry !== lastRy) {
-      lastRy = ry;
-      rig.style.setProperty('--ry', ry.toFixed(2) + 'deg');
-    }
-    if (rx !== lastRx) {
-      lastRx = rx;
-      rig.style.setProperty('--rx', rx.toFixed(2) + 'deg');
-    }
-  }
-
-  function measureDrift() {
-    if (reduce) { drift = 0; return; }
-    const r = section.getBoundingClientRect();
-    const vh = window.innerHeight || 1;
-    const p = Math.max(0, Math.min(1, (vh - r.top) / (vh + r.height)));
-    drift = (p - 0.5) * 16;
-  }
-
-  let lastScroll = -1;
-
-  function tick(dt, scrollY) {
-    if (reduce) {
-      shown = target;
-      tiltX = tiltY = 0;
-    } else {
-      const k = 1 - Math.pow(0.84, dt / 16.67);
-      shown += (target - shown) * k;
-      if (Math.abs(target - shown) < 0.02) shown = target;
-    }
-    // only read layout when the page actually scrolled
-    if (scrollY !== lastScroll || lastScroll < 0) {
-      lastScroll = scrollY;
-      measureDrift();
-    }
-    apply();
-  }
-
-  function fallbackFrame(now) {
-    if (!running) return;
-    const dt = last ? Math.min(64, now - last) : 16.67;
-    last = now;
-    tick(dt, window.scrollY || 0);
-    raf = requestAnimationFrame(fallbackFrame);
-  }
-
-  function ensureLoop() {
-    if (!supports3d) return;
-    if (KGS.engine && KGS.engine.addFrame) return;   // engine drives us
-    if (!running) {
-      running = true;
-      last = 0;
-      raf = requestAnimationFrame(fallbackFrame);
-    }
-  }
-
-  function stopLoop() {
-    running = false;
-    if (raf) cancelAnimationFrame(raf);
-    raf = 0;
+  function clearTilt() {
+    tiltX = 0;
+    tiltY = 0;
+    queueTilt();
   }
 
   /* ---------------------------- drag ------------------------------------- */
@@ -170,44 +134,66 @@
 
   viewport.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (!supports3d) return;
     drag = { x: e.clientX, start: target };
     viewport.classList.add('is-dragging');
-    if (e.pointerType !== 'mouse') viewport.setPointerCapture?.(e.pointerId);
+    try {
+      viewport.setPointerCapture(e.pointerId);
+    } catch {
+      /* older Safari: pointer capture is a nicety, not a requirement */
+    }
+    if (!reduce) clearTilt();
   });
 
-  viewport.addEventListener('pointermove', (e) => {
-    if (drag) {
-      target = drag.start + (e.clientX - drag.x) * 0.35;
-      ensureLoop();
-      return;
-    }
-    if (!hover || reduce) return;
-    const r = viewport.getBoundingClientRect();
-    if (!r.width) return;
-    tiltY = ((e.clientX - r.left) / r.width - 0.5) * 14;
-    tiltX = -((e.clientY - r.top) / r.height - 0.5) * 8;
-    ensureLoop();
-  }, { passive: true });
+  viewport.addEventListener(
+    'pointermove',
+    (e) => {
+      if (drag) {
+        target = drag.start + (e.clientX - drag.x) * 0.35;
+        setSpin(target);
+        return;
+      }
+      if (!finePointer || reduce || saveData || !supports3d) return;
+      const r = viewport.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      tiltY = ((e.clientX - r.left) / r.width - 0.5) * 12;
+      tiltX = -((e.clientY - r.top) / r.height - 0.5) * 7;
+      queueTilt();
+    },
+    { passive: true }
+  );
+
+  let releasedPointer = null;
 
   function endDrag(e) {
     if (!drag) return;
     drag = null;
+    releasedPointer = e && e.pointerId;
     viewport.classList.remove('is-dragging');
-    // settle on the nearest card
+    /* settle on the nearest card rather than leaving a half-turned ring */
     target = Math.round(target / STEP) * STEP;
+    setSpin(target);
     paintIndex();
-    ensureLoop();
-    if (e && e.pointerType !== 'mouse') viewport.releasePointerCapture?.(e.pointerId);
+    if (releasedPointer != null) {
+      try {
+        viewport.releasePointerCapture(releasedPointer);
+      } catch {
+        /* the pointer may already be gone; nothing to release */
+      }
+    }
   }
   viewport.addEventListener('pointerup', endDrag);
   viewport.addEventListener('pointercancel', endDrag);
 
   viewport.addEventListener('pointerleave', () => {
     if (drag) return;
-    tiltX = 0;
-    tiltY = 0;
-    ensureLoop();
+    if (!reduce && !saveData) clearTilt();
   });
+
+  /* images must not start a native drag halfway through a ring gesture */
+  for (const img of viewport.querySelectorAll('img')) {
+    img.addEventListener('dragstart', (e) => e.preventDefault());
+  }
 
   /* --------------------------- controls ---------------------------------- */
   const currentIndex = () => ((Math.round(-target / STEP) % N) + N) % N;
@@ -227,46 +213,15 @@
     });
   });
 
-
-  /* ------------------------- subscribe ----------------------------------- */
-  if (KGS.engine && KGS.engine.addFrame) {
-    KGS.engine.addFrame((state) => {
-      if (!visible || document.hidden) return;
-      tick(state.dt || 16.67, state.scrollY || 0);
-    });
-  }
-
   /* ---------------------------- promote ---------------------------------- */
   if (supports3d) {
     section.classList.add('is-live');
-    // initial paint at the first card, with drift applied once
-    shown = target = 0;
-    apply();
+    setSpin(0);
+    paintDepth(0);
   }
 
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        visible = entries.some((e) => e.isIntersecting);
-        if (visible) {
-          lastScroll = -1;   // force a layout read on entry
-          ensureLoop();
-        }
-        else stopLoop();
-      },
-      { rootMargin: '160px 0px 160px 0px' }
-    );
-    io.observe(section);
-  } else {
-    visible = true;
-  }
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopLoop();
-    else if (visible) ensureLoop();
-  });
-
-  paintIndex();
-  paintDepth(index);
-  if (KGS.engine) KGS.engine.lab = { goTo, get index() { return index; } };
+  /* initial caption/pressed state is authored in the markup; this only makes
+     the JS state agree with it when the DOM arrives pre-selected differently */
+  const first = chips.findIndex((c) => c.getAttribute('aria-pressed') === 'true');
+  if (first > 0) goTo(first);
 })();

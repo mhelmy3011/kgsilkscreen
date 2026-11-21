@@ -29,7 +29,7 @@ const kb = (p) => (fs.statSync(p).size / 1024).toFixed(1);
 console.log('\ndeploy — required files');
 for (const f of ['index.html', '404.html', 'favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml',
   'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png',
-  'assets/css/kgs.min.css', 'assets/js/kgs-hero.js', 'assets/js/kgs-quote.js',
+  'assets/css/kgs.min.css', 'assets/js/kgs-hero.js', 'assets/js/kgs-quote.js', 'assets/js/kgs-motion.js', 'assets/js/kgs-lab.js',
   'assets/img/slide-1-pull-360.avif', 'assets/img/og.jpg', '.htaccess']) {
   if (fs.existsSync(path.join(DIST, f))) good(f);
   else bad(`missing ${f}`);

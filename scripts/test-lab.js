@@ -31,8 +31,7 @@ const check = (cond, m) => (cond ? ok(m) : bad(m));
 async function load({ reduce = false, supports3d = true } = {}) {
   const errors = [];
   const vc = new VirtualConsole();
-  // WebGL is not implemented in jsdom; the ink canvas is expected to be a no-op
-  // here and is covered by the shader lint + smoke test instead.
+  // The light page has no canvas/WebGL; anything jsdom reports here is real.
   vc.on('jsdomError', (e) => {
     if (!/Not implemented: HTMLCanvasElement/.test(e.message)) errors.push(e.message);
   });
@@ -75,19 +74,19 @@ async function load({ reduce = false, supports3d = true } = {}) {
   return { dom, doc: dom.window.document, errors };
 }
 
-const angle = (rig) => parseFloat(rig.style.getPropertyValue('--ry')) || 0;
+const angle = (spin) => parseFloat(spin.style.getPropertyValue('--spin')) || 0;
 
 (async () => {
   console.log('\nlab — 3D ring');
 
   const { dom, doc, errors } = await load();
   const lab = doc.querySelector('.lab');
-  const rig = doc.querySelector('[data-lab-rig]');
+  const spin = doc.querySelector('[data-lab-spin]');
   const chips = [...doc.querySelectorAll('[data-lab-goto]')];
   const name = doc.querySelector('[data-lab-read]');
   const spec = doc.querySelector('[data-lab-spec]');
 
-  check(Boolean(lab && rig), 'section and rig exist in the served document');
+  check(Boolean(lab && spin), 'section and spin rig exist in the served document');
   check(lab.classList.contains('is-live'), 'promoted to 3D when preserve-3d is supported');
   check(chips.length === 6, 'six material chips');
   check(chips[0].getAttribute('aria-pressed') === 'true', 'first chip starts selected');
@@ -95,7 +94,7 @@ const angle = (rig) => parseFloat(rig.style.getPropertyValue('--ry')) || 0;
   // --- chip → angle + caption -------------------------------------------
   chips[2].dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true }));
   await sleep(500);
-  const a2 = angle(rig);
+  const a2 = angle(spin);
   check(a2 < -110 && a2 > -130, `chip 3 rotates the ring to the third card (${a2.toFixed(1)}°)`);
   check(name.textContent.trim() === 'زجاج برطمانات', 'caption names the selected material');
   check(spec.textContent.includes('إيبوكسي'), 'caption carries the ink/spec line');
@@ -125,7 +124,7 @@ const angle = (rig) => parseFloat(rig.style.getPropertyValue('--ry')) || 0;
   const rChips = [...r.doc.querySelectorAll('[data-lab-goto]')];
   rChips[4].dispatchEvent(new r.doc.defaultView.MouseEvent('click', { bubbles: true }));
   await sleep(150);
-  const a4 = angle(r.doc.querySelector('[data-lab-rig]'));
+  const a4 = angle(r.doc.querySelector('[data-lab-spin]'));
   check(Math.abs(a4 + 240) < 0.5, `reduced motion jumps straight to the target (${a4.toFixed(1)}°)`);
   check(r.doc.querySelector('[data-lab-read]').textContent.trim() === 'ستان أعلام', 'reduced motion still updates the caption');
   r.dom.window.close();

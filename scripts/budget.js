@@ -25,38 +25,26 @@ const BUDGETS = {
     label: 'Mobile 360x800 · first view',
     maxKB: 110,
     perAsset: {
-      // The plan set 17 KB when the document held three slides of copy. The
-      // 3-tap quote builder and the verifiable-commitments block (which replaced
-      // fabricated testimonials) are ~1.5 KB of that. They ship because they
-      // earn their bytes — a pre-written WhatsApp message removes the biggest
-      // drop-off on an Arabic trade site, and the commitments are the honest
-      // substitute for reviews the workshop doesn't have. The aggregate budget,
-      // which is what actually governs the mobile experience, is unchanged at
-      // 110 KB and we sit ~40 KB under it.
-      //
-      // 2026 re-baseline: 18 → 19 KB. The 3D material lab adds six AVIF cards,
-      // an aria-live caption and the hero instrument strip. That is +0.9 KB on
-      // the document and it buys the signature interaction of the page; the
-      // aggregate (the number that governs the phone) moved from ~48 to ~70 KB
-      // against a 110 KB ceiling.
+      // The light redesign deletes the WebGL ink engine entirely: three scripts
+      // (~26 KB raw) are replaced by one IntersectionObserver/rAF module. The
+      // only motion left is opacity/transform. The aggregate budget stays at
+      // 110 KB, and the first view now carries fewer bytes than before.
       '/': 19,
-      // 9 → 10 KB: the lab ring, its controls and the hero/card depth rules.
-      // The sheet is still deferred; nothing here is render-blocking on 4G.
-      '/assets/css/kgs.min.css': 10,
+      '/assets/css/kgs.min.css': 9.5,
       '/assets/js/kgs-hero.js': 2.5,
-      '/assets/js/kgs-page.js': 4,
-      '/assets/js/kgs-engine.js': 3.5,
-      '/assets/js/kgs-ink.js': 5,
-      // CSS-3D ring. Below the fold and deferred; idle until visible.
-      '/assets/js/kgs-lab.js': 3,
+      '/assets/js/kgs-motion.js': 4,
+      '/assets/js/kgs-lab.js': 4,
+      '/assets/js/kgs-quote.js': 2,
       '/assets/fonts/tajawal-arabic-900-normal.woff2': 13,
+      '/assets/fonts/tajawal-arabic-700-normal.woff2': 13,
       '/assets/fonts/tajawal-arabic-400-normal.woff2': 13,
       // the LCP image at 360w AVIF — plan target was <= 42 KB
       '/assets/img/slide-1-pull-360.avif': 42,
     },
-    assets: ['/', '/assets/css/kgs.min.css', '/assets/js/kgs-hero.js', '/assets/js/kgs-page.js',
-      '/assets/js/kgs-engine.js', '/assets/js/kgs-ink.js', '/assets/js/kgs-lab.js',
+    assets: ['/', '/assets/css/kgs.min.css', '/assets/js/kgs-hero.js',
+      '/assets/js/kgs-motion.js', '/assets/js/kgs-lab.js', '/assets/js/kgs-quote.js',
       '/assets/fonts/tajawal-arabic-900-normal.woff2',
+      '/assets/fonts/tajawal-arabic-700-normal.woff2',
       '/assets/fonts/tajawal-arabic-400-normal.woff2',
       '/assets/img/slide-1-pull-360.avif'],
   },
@@ -64,9 +52,10 @@ const BUDGETS = {
     label: 'Desktop 1440x900 · first view',
     maxKB: 190,
     perAsset: { '/assets/img/slide-1-pull-720.avif': 60 },
-    assets: ['/', '/assets/css/kgs.min.css', '/assets/js/kgs-hero.js', '/assets/js/kgs-page.js',
-      '/assets/js/kgs-engine.js', '/assets/js/kgs-ink.js', '/assets/js/kgs-lab.js',
+    assets: ['/', '/assets/css/kgs.min.css', '/assets/js/kgs-hero.js',
+      '/assets/js/kgs-motion.js', '/assets/js/kgs-lab.js', '/assets/js/kgs-quote.js',
       '/assets/fonts/tajawal-arabic-900-normal.woff2',
+      '/assets/fonts/tajawal-arabic-700-normal.woff2',
       '/assets/fonts/tajawal-arabic-400-normal.woff2',
       '/assets/img/slide-1-pull-720.avif'],
   },
