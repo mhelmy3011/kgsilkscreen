@@ -1,0 +1,53 @@
+{
+  "name": "kgsilkscreen",
+  "version": "0.1.0",
+  "private": true,
+  "description": "كمال جادو — سلك سكرين | Landing page + 3 scroll-journey concept prototypes (Arabic RTL, Egyptian market)",
+  "type": "commonjs",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node --watch server.js",
+    "export": "node scripts/export-static.js",
+    "test": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/check-contrast.js && node scripts/check-a11y.js && node scripts/test-hero.js && node scripts/test-quote.js && node scripts/smoke.js",
+    "seo": "node scripts/inject-jsonld.js",
+    "build": "node scripts/logo-mark.js && node scripts/logo-lockup.js && node scripts/inline-brand.js && node scripts/inject-contact.js && node scripts/inject-jsonld.js && node scripts/build-images.js && node scripts/minify-css.js && node scripts/ssg.js && node scripts/export-static.js && node scripts/check-deploy.js",
+    "images": "node scripts/build-images.js",
+    "og": "python3 scripts/og-image.py",
+    "assets": "node scripts/build-images.js && node scripts/og-image.js",
+    "ssg": "node scripts/ssg.js",
+    "check": "node scripts/check-assets.js",
+    "lint": "node scripts/lint-shaders.js",
+    "verify": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/check-contrast.js && node scripts/check-a11y.js && node scripts/check-cache.js && node scripts/check-fonts.js && node scripts/check-firstview.js && node scripts/lint-shaders.js && node scripts/smoke.js && node scripts/check-assets.js",
+    "budget": "node scripts/budget.js",
+    "css": "node scripts/minify-css.js",
+    "fonts": "node scripts/build-fonts.js",
+    "logo": "node scripts/logo-mark.js && node scripts/logo-lockup.js && node scripts/inline-brand.js",
+    "check:logo": "node scripts/check-logo.js",
+    "check:mobile": "node scripts/check-mobile.js",
+    "test:hero": "node scripts/test-hero.js",
+    "brand": "node scripts/inline-brand.js",
+    "test:quote": "node scripts/test-quote.js",
+    "contact": "node scripts/inject-contact.js",
+    "check:contrast": "node scripts/check-contrast.js",
+    "check:a11y": "node scripts/check-a11y.js",
+    "check:deploy": "node scripts/export-static.js && node scripts/check-deploy.js",
+    "check:fonts": "node scripts/check-fonts.js",
+    "check:firstview": "node scripts/check-firstview.js",
+    "check:cache": "node scripts/check-cache.js"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@fontsource/alexandria": "^5.3.0",
+    "@fontsource/cairo": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/tajawal": "^5.3.0",
+    "jsdom": "^24.1.3"
+  }
+}

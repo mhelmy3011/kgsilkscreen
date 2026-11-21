@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /home.html
+Allow: /assets/
+Disallow: /concept-1/
+Disallow: /concept-2/
+Disallow: /concept-3/
+Disallow: /hub.html
+Disallow: /api/
+
+Sitemap: https://kgsilkscreen.store/sitemap.xml
