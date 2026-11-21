@@ -321,7 +321,7 @@ button { font: inherit; color: inherit; }
   padding: 10px 8px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(253, 251, 247, 0.7);
+  background: rgba(253, 251, 247, 0.9);
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--ink-2);
@@ -346,12 +346,12 @@ button { font: inherit; color: inherit; }
   gap: 12px;
   block-size: var(--nav-h);
   padding-inline: var(--gutter);
-  background: rgba(250, 246, 238, 0.78);
+  background: rgba(250, 246, 238, 0.92);
   border-block-end: 1px solid transparent;
   transition: background 0.35s, border-color 0.35s, box-shadow 0.35s;
 }
 .nav.is-compact {
-  background: rgba(250, 246, 238, 0.9);
+  background: rgba(250, 246, 238, 0.97);
   border-block-end-color: var(--line);
   box-shadow: 0 12px 30px -26px rgba(40, 28, 14, 0.5);
 }
@@ -419,7 +419,7 @@ button { font: inherit; color: inherit; }
   padding: 7px var(--gutter) 9px;
   overflow-x: auto;
   scrollbar-width: none;
-  background: rgba(247, 242, 232, 0.92);
+  background: rgba(247, 242, 232, 0.97);
   border-block-end: 1px solid var(--line);
 }
 .nav__jump::-webkit-scrollbar { display: none; }
@@ -461,7 +461,6 @@ button { font: inherit; color: inherit; }
   .nav__links { display: flex; gap: 4px; }
   .nav__jump { display: none; }
   .nav__cta { margin-inline-start: 8px; }
-  .depth-hud { display: flex; }
   .nav__brand { font-size: 19px; }
   .nav__mark { inline-size: 44px; block-size: 44px; border-radius: 14px; }
   .nav__mark svg { inline-size: 29px; block-size: 29px; }
@@ -931,6 +930,14 @@ button { font: inherit; color: inherit; }
   .hero__arrow { display: grid; }
   .hero__dots { padding-block: 0 26px; }
   .hero__scroll { display: flex; }
+}
+
+@media (min-width: 1280px) {
+  .depth-hud { display: flex; }
+}
+
+@media (min-width: 900px) and (max-height: 740px) {
+  .hero { block-size: auto; }
 }
 
 @media (min-width: 1200px) {
