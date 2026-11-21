@@ -33,7 +33,10 @@ def hexc(c, alpha=255):
 
 def render(svg_path, size, bg=(6, 12, 16), fg_override=None):
     svg = open(svg_path, encoding="utf-8").read()
-    vb = re.search(r'viewBox="0 0 ([\\d.]+) ([\\d.]+)"', svg)
+    # In a raw string, backslash-d is a digit. The pattern below
+    # previously escaped it twice, matching a literal backslash, so it
+    # never fired: non-square SVGs fell back to 48x48 and rendered stretched.
+    vb = re.search(r'viewBox="0 0 ([0-9.]+) ([0-9.]+)"', svg)
     vw, vh = (float(vb.group(1)), float(vb.group(2))) if vb else (48.0, 48.0)
     sc = size / vw
     img = Image.new("RGB", (size, max(1, int(round(vh * sc)))), bg)
