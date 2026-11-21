@@ -21,12 +21,15 @@
     "ssg": "node scripts/ssg.js",
     "check": "node scripts/check-assets.js",
     "lint": "node scripts/lint-shaders.js",
-    "verify": "node scripts/check-logo.js && node scripts/lint-shaders.js && node scripts/smoke.js && node scripts/check-assets.js",
+    "verify": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/lint-shaders.js && node scripts/smoke.js && node scripts/check-assets.js",
     "budget": "node scripts/budget.js",
     "css": "node scripts/minify-css.js",
     "fonts": "node scripts/build-fonts.js",
-    "logo": "node scripts/logo-mark.js && node scripts/logo-lockup.js",
-    "check:logo": "node scripts/check-logo.js"
+    "logo": "node scripts/logo-mark.js && node scripts/logo-lockup.js && node scripts/inline-brand.js",
+    "check:logo": "node scripts/check-logo.js",
+    "check:mobile": "node scripts/check-mobile.js",
+    "test:hero": "node scripts/test-hero.js",
+    "brand": "node scripts/inline-brand.js"
   },
   "dependencies": {
     "compression": "^1.7.4",

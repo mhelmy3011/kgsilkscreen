@@ -86,7 +86,7 @@
 
   --gutter: clamp(18px, 5vw, 96px);
   --maxw: 1280px;
-  --nav-h: 68px;
+  --nav-h: 60px;   /* mobile first; desktop raises it below */
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -112,8 +112,14 @@ body {
   background: var(--ink-1);
   color: var(--paper);
   font-family: var(--font-body);
-  font-size: clamp(15px, 1.02vw, 17px);
-  line-height: 1.8;
+  /* MOBILE-FIRST TYPE SCALE.
+     17px is the floor, not a clamp minimum: the previous
+     `clamp(15px, 1.02vw, 17px)` settled at exactly 15px on a 360px phone —
+     below every comfortable reading threshold, and below the 16px point where
+     iOS starts auto-zooming on focus. It only grows where the line is long. */
+  font-size: 17px;
+  line-height: 1.72;
+  text-size-adjust: 100%;
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -123,6 +129,14 @@ body {
 img, canvas, svg, video { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; }
+
+/* Touch ergonomics. `manipulation` removes the legacy 300ms double-tap delay,
+   and killing the tap highlight stops the grey flash that makes a site feel
+   like a web page rather than an app. */
+a, button, summary, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 ::selection { background: var(--pigment); color: #0b0603; }
 
 h1, h2, h3, h4, h5 {
@@ -341,14 +355,19 @@ ul, ol { margin: 0; }
 }
 @media (min-width: 940px) { .nav__links { display: flex; } }
 .nav__links a {
-  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;      /* thumb, not cursor */
+  padding: 0 16px;
   border-radius: 999px;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--paper-dim);
   transition: color 0.25s, background 0.25s;
 }
-.nav__links a:hover { color: var(--paper); background: rgba(238, 243, 241, 0.07); }
+@media (hover: hover) {
+  .nav__links a:hover { color: var(--paper); background: rgba(238, 243, 241, 0.07); }
+}
 .nav__cta { margin-inline-start: auto; }
 @media (min-width: 940px) { .nav__cta { margin-inline-start: 12px; } }
 
@@ -402,8 +421,11 @@ ul, ol { margin: 0; }
   -webkit-backdrop-filter: blur(10px);
 }
 .btn--ghost:hover { background: rgba(238, 243, 241, 0.09); border-color: var(--paper-mute); transform: translateY(-2px); }
-.btn--sm { padding: 10px 18px; font-size: 13px; }
-.btn--lg { padding: 16px 32px; font-size: 15.5px; }
+/* 48px is the floor for anything tappable — Apple asks for 44, Material for
+   48, and a thumb on a bus asks for more than both. */
+.btn { min-block-size: 48px; }
+.btn--sm { padding: 10px 18px; font-size: 14px; min-block-size: 44px; }
+.btn--lg { padding: 15px 24px; font-size: 16px; min-block-size: 52px; }
 .btn--block { width: 100%; }
 
 /* ------------------------------- 7. العناصر المشتركة --------------------- */
@@ -449,8 +471,11 @@ ul, ol { margin: 0; }
 }
 .section__head { max-width: 62ch; }
 .section__title {
-  font-size: clamp(29px, 4.6vw, 62px);
-  line-height: 1.06;
+  /* 32px at 360 — comfortable for a Kufi face, which needs more size than a
+     Latin one to read at the same optical weight. */
+  font-size: clamp(32px, 8.6vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
 }
 .section__title em {
   font-style: normal;
@@ -460,10 +485,11 @@ ul, ol { margin: 0; }
   color: transparent;
 }
 .section__lede {
-  margin-block-start: 18px;
+  margin-block-start: 16px;
   color: var(--paper-dim);
-  max-width: 56ch;
-  font-size: clamp(14.5px, 1.1vw, 17px);
+  max-inline-size: 52ch;
+  font-size: 17px;
+  line-height: 1.7;
 }
 
 /* mono meta chip */
@@ -602,8 +628,8 @@ ul, ol { margin: 0; }
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
+  font-size: 12px;              /* the phone size IS the base size */
+  letter-spacing: 0.03em;
   color: var(--paper-dim);
   margin-block-end: clamp(14px, 2.4vh, 22px);
 }
@@ -717,6 +743,7 @@ ul, ol { margin: 0; }
 .hero__dots button {
   inline-size: 34px;
   block-size: 44px;
+  min-block-size: 44px;
   padding: 0;
   border: 0;
   background: none;
@@ -784,6 +811,7 @@ ul, ol { margin: 0; }
   .hero__title--h2 { font-size: clamp(3.4rem, 6.5vw, 5.6rem); }
   .hero__title .l2 { font-size: 0.42em; }
   .hero__lede { max-inline-size: 54ch; font-size: 1.08rem; }
+  .hero__badge { font-size: 12.5px; letter-spacing: 0.05em; }
   .hero__art img { object-position: 50% 42%; }
   .hero__shade {
     background:
@@ -968,19 +996,21 @@ ul, ol { margin: 0; }
 .card__body {
   position: relative;
   z-index: 1;
-  padding: 20px 22px 22px;
+  padding: 18px 18px 20px;
   display: flex;
   flex-direction: column;
   gap: 9px;
   flex: 1;
 }
 .card__body h3 {
-  font-size: clamp(17px, 1.5vw, 21px);
+  font-size: 19px;
   letter-spacing: -0.015em;
 }
 .card__body p {
-  font-size: 13.6px;
-  line-height: 1.75;
+  /* body copy never drops below 15px: it was 13.6px, which is where Arabic
+     starts to look like a caption rather than readable prose. */
+  font-size: 15px;
+  line-height: 1.72;
   color: var(--paper-dim);
   flex: 1;
 }
@@ -996,16 +1026,17 @@ ul, ol { margin: 0; }
 .card__price {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--cyan-soft);
 }
 .card__link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-block-size: 44px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--paper);
   transition: gap 0.3s;
 }
@@ -1048,8 +1079,8 @@ ul, ol { margin: 0; }
   font-weight: 500;
   margin-block-end: 15px;
 }
-.step h3 { font-size: clamp(16px, 1.35vw, 19px); }
-.step p { margin-block-start: 8px; font-size: 13.4px; line-height: 1.75; color: var(--paper-dim); }
+.step h3 { font-size: 18px; }
+.step p { margin-block-start: 8px; font-size: 15px; line-height: 1.72; color: var(--paper-dim); }
 .step__line {
   position: absolute;
   inset-block-start: 0;
@@ -1083,9 +1114,9 @@ ul, ol { margin: 0; }
 .why__item {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 16px;
+  gap: 14px;
   align-items: start;
-  padding: 20px 22px;
+  padding: 18px 17px;
   background: linear-gradient(120deg, rgba(10, 16, 20, 0.92), rgba(7, 12, 16, 0.92));
   transition: background 0.35s;
 }
@@ -1101,8 +1132,8 @@ ul, ol { margin: 0; }
   flex: none;
 }
 .why__ico svg { width: 17px; height: 17px; }
-.why__item h3 { font-size: 16px; }
-.why__item p { margin-block-start: 5px; font-size: 13.2px; color: var(--paper-dim); line-height: 1.7; }
+.why__item h3 { font-size: 17px; }
+.why__item p { margin-block-start: 5px; font-size: 15px; color: var(--paper-dim); line-height: 1.7; }
 
 .why__media {
   position: relative;
@@ -1165,7 +1196,7 @@ ul, ol { margin: 0; }
 }
 @media (min-width: 820px) { .quotes { grid-template-columns: repeat(3, 1fr); } }
 .quote {
-  padding: 24px;
+  padding: 21px;
   border-radius: var(--r-md);
   border: 1px solid var(--line);
   background: linear-gradient(170deg, rgba(238, 243, 241, 0.065), rgba(238, 243, 241, 0.01));
@@ -1175,7 +1206,7 @@ ul, ol { margin: 0; }
 }
 .quote__stars { display: flex; gap: 3px; color: #ffc94d; }
 .quote__stars svg { width: 14px; height: 14px; }
-.quote p { font-size: 14.2px; line-height: 1.85; color: var(--paper); flex: 1; }
+.quote p { font-size: 15.5px; line-height: 1.78; color: var(--paper); flex: 1; }
 .quote footer {
   display: flex;
   align-items: center;
@@ -1197,7 +1228,7 @@ ul, ol { margin: 0; }
   flex: none;
 }
 .quote__who b { display: block; font-size: 13px; font-weight: 700; }
-.quote__who span { display: block; font-size: 11.5px; color: var(--paper-mute); }
+.quote__who span { display: block; font-size: 13.5px; color: var(--paper-mute); }
 
 /* ------------------------------- 13. الرقم/التحويل ----------------------- */
 .convert {
@@ -1237,10 +1268,11 @@ ul, ol { margin: 0; }
 }
 .convert h2 em { font-style: normal; color: var(--pigment-soft); }
 .convert p {
-  margin-block-start: 16px;
+  margin-block-start: 14px;
   color: var(--paper-dim);
-  max-width: 46ch;
-  font-size: clamp(14px, 1.1vw, 16.5px);
+  max-inline-size: 46ch;
+  font-size: 16.5px;
+  line-height: 1.7;
 }
 .convert__actions { display: grid; gap: 11px; }
 .convert__note {
@@ -1270,11 +1302,12 @@ ul, ol { margin: 0; }
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 20px 4px;
+  min-block-size: 56px;          /* a whole row is the tap target, not the text */
+  padding: 16px 4px;
   cursor: pointer;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(14.5px, 1.25vw, 17.5px);
+  font-size: 16px;
   color: var(--paper);
   list-style: none;
   transition: color 0.25s;
@@ -1294,12 +1327,11 @@ ul, ol { margin: 0; }
 }
 .faq details[open] summary::after { rotate: -135deg; margin-block-start: 4px; }
 .faq details > div {
-  padding-block-end: 22px;
-  padding-inline-end: 32px;
+  padding-block-end: 20px;
   color: var(--paper-dim);
-  font-size: 14px;
-  line-height: 1.9;
-  max-width: 72ch;
+  font-size: 15.5px;
+  line-height: 1.85;
+  max-inline-size: 68ch;
 }
 
 /* ------------------------------- 15. الفوتر ------------------------------ */
@@ -1325,7 +1357,7 @@ ul, ol { margin: 0; }
   font-size: 17px;
   margin-block-end: 14px;
 }
-.footer p { color: var(--paper-mute); font-size: 13px; max-width: 38ch; line-height: 1.8; }
+.footer p { color: var(--paper-mute); font-size: 14.5px; max-inline-size: 38ch; line-height: 1.75; }
 .footer h4 {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -1338,10 +1370,13 @@ ul, ol { margin: 0; }
 .footer ul { list-style: none; padding: 0; display: grid; gap: 9px; }
 .footer ul a, .footer address {
   font-style: normal;
-  font-size: 13px;
+  font-size: 14.5px;
   color: var(--paper-dim);
   transition: color 0.25s;
 }
+/* footer links are tapped, so give each one a full-height row */
+.footer ul a { display: inline-flex; align-items: center; min-block-size: 44px; }
+.footer ul { gap: 0; }
 .footer ul a:hover { color: var(--pigment-soft); }
 .footer__bar {
   display: flex;
@@ -1352,7 +1387,7 @@ ul, ol { margin: 0; }
   margin-block-start: clamp(30px, 5vh, 48px);
   padding-block-start: 22px;
   border-block-start: 1px solid var(--line);
-  font-size: 11.8px;
+  font-size: 13.5px;
   color: var(--paper-mute);
 }
 .footer__bar a { color: var(--paper-dim); border-block-end: 1px solid rgba(255, 90, 31, 0.5); }
@@ -1375,7 +1410,8 @@ ul, ol { margin: 0; }
   box-shadow: 0 20px 44px -20px rgba(0, 0, 0, 1);
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
+  min-block-size: 48px;
   transform: translateY(calc((1 - var(--show, 0)) * 120%));
   opacity: var(--show, 0);
   transition: transform 0.5s var(--ease-out), opacity 0.4s, background 0.3s;
@@ -1391,9 +1427,11 @@ ul, ol { margin: 0; }
   flex: none;
 }
 .dock__ico svg { width: 17px; height: 17px; }
+/* the dock is a thumb target, so it keeps its 15px label at every width —
+   only the horizontal padding gets tighter on a small phone */
 @media (max-width: 520px) {
-  .dock { font-size: 12px; padding: 8px 14px 8px 8px; gap: 8px; }
-  .dock__ico { width: 27px; height: 27px; }
+  .dock { padding: 8px 14px 8px 8px; gap: 8px; }
+  .dock__ico { width: 28px; height: 28px; }
 }
 
 /* ------------------------------- 17. تقليل الحركة ------------------------ */
@@ -1413,75 +1451,86 @@ ul, ol { margin: 0; }
 }
 
 /* ==========================================================================
-   19. الموبايل — تحسينات مقاسة على عرض ٣٦٠–٤٣٠
+   19. الموبايل أولًا — ثم التوسّع
+   --------------------------------------------------------------------------
+   EVERY base rule above is already the phone rule: 17px body, 48px targets,
+   one column, full-width primary actions. This section therefore only does two
+   things:
+
+     · refines the few places where a 360px screen needs *more* care than a
+       generic base rule can express (very small phones, landscape phones), and
+     · raises the layout to two/three columns once there is room.
+
+   Anything that *shrinks* type or spacing on a phone belongs above, in the
+   base layer, or it isn't mobile-first. That was the bug in the old stylesheet:
+   base sizes were desktop sizes, and this block spent its life shrinking them
+   back down — which is how body copy ended up at 13px on the device that 90%
+   of visitors use.
    ========================================================================== */
-@media (max-width: 640px) {
-  :root { --nav-h: 60px; }
 
-  .hero { padding-block-start: calc(var(--nav-h) + 28px); }
-  .hero__title { font-size: clamp(46px, 15vw, 72px); }
-  .hero__title .l2 { font-size: 0.44em; }
-  .hero__lede { font-size: 14.6px; line-height: 1.9; }
-  .hero__badge { font-size: 11px; padding: 6px 12px 6px 10px; }
+/* a 360px phone: the true target. Tighten rhythm, never legibility. */
+@media (max-width: 430px) {
+  :root { --gutter: clamp(16px, 5vw, 22px); }
 
-  /* full-width tap targets; 48px min height is the iOS/Android guideline */
-  .hero__cta { gap: 10px; }
-  .hero__cta .btn { width: 100%; min-height: 50px; }
-  .btn--lg { padding: 15px 22px; font-size: 14.5px; }
+  .section { padding-block: 56px; }
+  .section__head { max-inline-size: 100%; }
 
-  .hero__stats { gap: 14px 10px; }
-  .hero__stat dd { font-size: 20px; }
-  .hero__stat dt { font-size: 9px; letter-spacing: 0.1em; }
 
-  .section { padding-block: clamp(52px, 9vh, 80px); }
-  .section__title { font-size: clamp(26px, 8.2vw, 38px); }
-  .section__lede { font-size: 14px; }
+  /* three stats in a row is the limit at this width; keep them legible
+     rather than shrinking, and let the label wrap if it must. */
+  .hero__stats { gap: 0 10px; }
+  .hero__stat dd { font-size: 17px; }
+  .hero__stat dt { font-size: 9px; letter-spacing: 0.02em; }
 
-  .card__body { padding: 17px 18px 19px; }
-  .card__body p { font-size: 13.2px; }
-  .card__foot { flex-wrap: wrap; }
-  .card__price { font-size: 11.8px; }
-
-  .why__item { padding: 17px 16px; gap: 13px; }
-  .why__item h3 { font-size: 15px; }
-  .why__item p { font-size: 12.8px; }
-
-  .quote { padding: 19px; }
-  .quote p { font-size: 13.6px; }
-
-  .convert__card { border-radius: var(--r-lg); padding: 24px 20px 26px; }
-  .convert h2 { font-size: clamp(24px, 7.4vw, 34px); }
-
-  .faq summary { font-size: 14px; padding: 17px 2px; }
-  .faq details > div { font-size: 13.4px; padding-inline-end: 8px; }
-
-  .footer__bar { font-size: 11px; }
-  .footer__bar span:last-child { line-height: 2; }
-
-  /* the sticky dock must not cover the last CTA: pad the page bottom */
-  .footer { padding-block-end: 88px; }
-  .ink-grain { opacity: 0.22; }
+  .card__media { aspect-ratio: 16 / 11; }
+  .convert__card { border-radius: var(--r-lg); padding: 22px 18px 24px; }
+  .footer { padding-block-end: 92px; }   /* clear the sticky dock */
 }
 
-/* very small phones */
-@media (max-width: 380px) {
-  .hero__title { font-size: 42px; }
-  .hero__stat dd { font-size: 18px; }
+/* very small / older phones (iPhone SE, 320px Androids) */
+@media (max-width: 360px) {
+  body { font-size: 16px; }
+  .hero__title { font-size: 2.25rem; }
+  .hero__title .l2 { font-size: 0.55em; }
+  .hero__stat dd { font-size: 15.5px; }
   .nav__brand span small { display: none; }
+  .hero__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 12px; }
   .dock { inset-block-end: 12px; inset-inline-start: 12px; }
 }
 
-/* landscape phones: the hero must not become a sliver */
-@media (max-height: 520px) and (orientation: landscape) {
-  .hero { min-block-size: auto; padding-block: 84px 44px; }
-  .hero__media { display: none; }
-  .hero__stats { margin-block-start: 22px; }
+/* landscape phone: 100svh would leave ~360px of height, so the hero relaxes
+   its height lock and the type steps down one notch */
+@media (max-height: 560px) and (orientation: landscape) {
+  .hero { block-size: auto; min-block-size: 0; }
+  .hero__slide { align-content: start; }
+  .hero__inner { padding-block: calc(var(--nav-h) + 20px) 34px; }
+  .hero__title { font-size: clamp(2rem, 6vw, 2.75rem); }
+  .hero__lede, .hero__stats { display: none; }
 }
 
-/* tablets */
-@media (min-width: 641px) and (max-width: 1039px) {
-  .hero__grid { grid-template-columns: 1fr; }
-  .hero__title { font-size: clamp(60px, 12vw, 110px); }
+/* ---- expansion: tablets and up ------------------------------------------ */
+@media (min-width: 600px) {
+  :root { --nav-h: 64px; }
+  .section { padding-block: clamp(64px, 9vh, 96px); }
+  .hero__lede { margin-block-start: 18px; }
+}
+
+@media (min-width: 900px) {
+  :root { --nav-h: 68px; }
+  body { font-size: 17.5px; }
+  .section__title { font-size: clamp(40px, 4.4vw, 62px); }
+  .section__lede { font-size: 18px; }
+  .card__body { padding: 22px 22px 24px; }
+  .card__body h3 { font-size: 21px; }
+  .card__body p { font-size: 15.5px; }
+  .step p, .why__item p { font-size: 15.5px; }
+  .faq summary { font-size: 17.5px; }
+  .faq details > div { font-size: 16px; }
+}
+
+@media (min-width: 1200px) {
+  body { font-size: 18px; }
+  .card__body p { font-size: 16px; }
 }
 
 /* ==========================================================================
