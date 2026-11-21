@@ -18,6 +18,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const express = require('express');
 const compression = require('compression');
+const zlib = require('node:zlib');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -43,6 +44,14 @@ app.set('trust proxy', true);
 app.use(
   compression({
     threshold: 1024,
+    /* The `compression` package defaults brotli to quality 4, and at that
+       level brotli is WORSE than gzip on this stylesheet: 9342 B vs 8808 B.
+       Text is compressed once per version and cached by the browser
+       afterwards, so the CPU cost of quality 9 is paid once and never by a
+       returning visitor. Measured on kgs.min.css:
+         q4 9342 · q6 8364 · q9 8277 · q11 7714 · gzip9 8808
+       q9 is the knee — q11 costs ~3x the CPU for 0.5 KB more. */
+    brotli: { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 9 } },
     // Compressed HTML/CSS/JS is what actually makes this fast on Egyptian 4G.
     filter: (req, res) => {
       const type = res.getHeader('Content-Type') || '';
@@ -103,17 +112,19 @@ app.use(
     index: 'index.html',
     extensions: ['html'],
     setHeaders(res, filePath) {
-      if (filePath.endsWith('.html')) {
-        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
-      } else if (
-        filePath.endsWith('.woff2') ||
-        filePath.endsWith('.webp') ||
-        filePath.endsWith('.avif')
-      ) {
-        // versioned-in-practice binaries: cache hard, revalidate never
+      const hashed = /\.[a-f0-9]{10}\.(?:css|js|woff2?|avif|webp|png|jpg|svg)$/.test(filePath);
+
+      /* Content-hashed files can never go stale, so they get the year.
+         Everything else must revalidate: while developing, an unhashed
+         kgs.min.css cached for a week means the browser keeps painting an
+         old design and it looks like the code is broken. Production has the
+         same rule in .htaccess — a year only for hashed names. */
+      if (hashed) {
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
       } else {
-        res.setHeader('Cache-Control', 'public, max-age=604800');
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
       }
     },
   })

@@ -94,6 +94,8 @@
   --gutter: clamp(18px, 5vw, 96px);
   --maxw: 1280px;
   --nav-h: 60px;   /* mobile first; desktop raises it below */
+  /* the mobile jump strip sits under the header; zero once it is hidden */
+  --strip-h: 52px;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -107,7 +109,9 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   background: var(--ink-1);
-  scroll-padding-top: calc(var(--nav-h) + 12px);
+  /* must clear BOTH the header and the mobile jump strip, or a tapped anchor
+     lands underneath the fixed chrome */
+  scroll-padding-top: calc(var(--nav-h) + var(--strip-h, 0px) + 12px);
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -357,6 +361,65 @@ ul, ol { margin: 0; }
   padding: 0;
 }
 @media (min-width: 940px) { .nav__links { display: flex; } }
+
+/* ---- mobile jump strip ---------------------------------------------------
+   On a phone there is no room for the link list, and a hamburger hides
+   navigation behind a tap — the one thing a mobile-first page should never do.
+   Instead: a strip of real links, one thumb-swipe wide, sitting under the
+   brand inside the fixed header. It travels with the header, so it is always
+   reachable, and it needs no JavaScript. */
+.nav__jump {
+  /* the header is a flex row; the strip becomes its own full-width line */
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline: 0;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding: 0 var(--gutter) 8px;
+  /* a touch of shade so the chips stay legible over the hero photograph */
+  background: linear-gradient(to bottom, rgba(4, 7, 10, 0.86), rgba(4, 7, 10, 0.55) 70%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-overflow-scrolling: touch;
+  /* `to left` is wrong in an RTL strip: the reader starts on the RIGHT, so the
+     fade belongs on the left edge — the side the overflow is going towards.
+     Without the flip, the first chip ("الخدمات") is the one that gets clipped. */
+  mask-image: linear-gradient(to right, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
+  /* Collapses on scroll. A permanent strip would cost 52px on every screen for
+     the whole session — nearly 7% of a small phone — to solve a moment that
+     only exists in the first viewport. It slides away once you have committed
+     to reading, and the dock bar covers navigation from there. */
+  transition: opacity 0.3s var(--ease-out), translate 0.3s var(--ease-out);
+}
+.nav.is-compact .nav__jump {
+  opacity: 0;
+  translate: 0 -8px;
+  pointer-events: none;
+}
+.nav__jump::-webkit-scrollbar { display: none; }
+.nav__jump a {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;          /* thumb */
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(238, 243, 241, 0.06);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--paper-dim);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav__jump a:active { background: rgba(238, 243, 241, 0.14); color: var(--paper); }
+@media (min-width: 940px) { .nav__jump { display: none; } :root { --strip-h: 0px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .nav__jump a { transition: background 0.2s, color 0.2s; }
+}
 .nav__links a {
   display: inline-flex;
   align-items: center;
@@ -523,8 +586,9 @@ ul, ol { margin: 0; }
   position: relative;
   z-index: 2;
   /* svh is the small viewport: the hero fits when the address bar is visible,
-     so the first slide's CTA is never pushed below the fold. */
-  block-size: 100svh;
+     so the first slide's CTA is never pushed below the fold. The mobile jump
+     strip sits under the header, so the hero starts below both. */
+  block-size: calc(100svh - var(--strip-h, 0px));
   min-block-size: 34rem;
   max-block-size: 60rem;
   overflow: clip;
@@ -708,12 +772,15 @@ ul, ol { margin: 0; }
   padding-block-start: 14px;
   border-block-start: 1px solid var(--line);
 }
+/* Arabic label. Was 9.5px in IBM Plex Mono — mono has no Arabic, so it fell
+   back to another family, and 9.5px Arabic loses its dots at 1x. */
 .hero__stat dt {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.06em;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--paper-mute);
-  margin-block-end: 3px;
+  margin-block-end: 4px;
 }
 .hero__stat dd {
   margin: 0;
@@ -782,9 +849,9 @@ ul, ol { margin: 0; }
   align-items: center;
   gap: 10px;
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.08em;
+  font-family: var(--font-display);   /* Arabic label, not a Latin mono one */
+  font-size: 13px;
+  letter-spacing: 0;
   color: var(--paper-mute);
   writing-mode: horizontal-tb;
 }
@@ -1009,11 +1076,12 @@ ul, ol { margin: 0; }
   inset-block-start: 12px;
   inset-inline-end: 12px;
   z-index: 2;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 5px 10px;
+  /* "قماش · Cotton" — Arabic plus Latin, so it cannot be mono */
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  padding: 5px 11px;
   border-radius: 999px;
   background: rgba(4, 7, 10, 0.62);
   border: 1px solid rgba(238, 243, 241, 0.16);
@@ -1214,12 +1282,12 @@ ul, ol { margin: 0; }
 }
 .why__badge span {
   display: block;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--paper-mute);
-  margin-block-start: 3px;
+  margin-block-start: 4px;
 }
 .why__badge i {
   width: 9px; height: 9px; border-radius: 50%;

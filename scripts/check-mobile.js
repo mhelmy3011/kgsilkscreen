@@ -151,7 +151,11 @@ else {
 }
 
 // 7 ── the hero must use svh, not vh, so the address bar cannot push the CTA out
-if (/\.hero\s*\{[^}]*block-size:\s*100svh/.test(strip(css))) good('hero height uses svh');
+// svh keeps the address bar from pushing the CTA out of the first screen.
+// calc(100svh - var(--strip-h)) is equally valid — the point is that the unit
+// is svh, not vh. Requiring the literal string forced a redesign back into a
+// form the check liked, which is the tail wagging the dog.
+if (/\.hero\s*\{[^}]*block-size:\s*(?:calc\(\s*)?100svh/.test(strip(css))) good('hero height uses svh');
 else bad('hero does not use 100svh');
 
 // 8 ── horizontal scroll safety net
