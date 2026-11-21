@@ -18,6 +18,7 @@
  * home.html when it doesn't (so a fresh clone works with zero build steps).
  */
 
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -27,7 +28,25 @@ const CSS_FULL = path.join(ROOT, 'public', 'assets', 'css', 'kgs.css');
 const CSS_MIN = path.join(ROOT, 'public', 'assets', 'css', 'kgs.min.css');
 // prefer the minified build when it exists (npm run css produces it)
 const CSS = CSS_FULL;   // always split the annotated source, then minify
-const CSS_HREF = fs.existsSync(CSS_MIN) ? '/assets/css/kgs.min.css' : '/assets/css/kgs.css';
+/* Content-hashed filename.
+
+   The .htaccess serves css/js for a YEAR with `immutable`. That is only safe if
+   the URL changes when the bytes change — otherwise a returning visitor keeps
+   the old sheet for twelve months. And it is not hypothetical: the very first
+   build of this site (0fc3c9b) drew the logo as a small mark inside an orange
+   rounded tile, and three redesigns later browsers were still showing that
+   tile because the filename never changed.
+
+   So the href carries a short hash of the file contents. The canonical file is
+   still written (kgs.min.css) for anything that references it directly; the
+   hashed copy is what the document points at. */
+const cssFile = fs.existsSync(CSS_MIN) ? CSS_MIN : CSS_FULL;
+const cssBytes = fs.readFileSync(cssFile);
+const cssHash = crypto.createHash('sha256').update(cssBytes).digest('hex').slice(0, 10);
+const CSS_HASHED = path.join(path.dirname(cssFile),
+  path.basename(cssFile, '.css') + '.' + cssHash + '.css');
+fs.writeFileSync(CSS_HASHED, cssBytes);
+const CSS_HREF = '/assets/css/' + path.basename(CSS_HASHED);
 const { minify } = require('./minify-css.js');
 const OUT_DIR = path.join(ROOT, 'public', '_ssg');
 const OUT = path.join(OUT_DIR, 'home.html');
@@ -106,6 +125,34 @@ const noscript = `<noscript><style>
 .dock{opacity:1;transform:none}
 </style></noscript>`;
 html = html.replace('</head>', noscript + '\n</head>');
+
+/* ---------------------------------------------------------------- js hashes
+   Same reasoning as the stylesheet: the .htaccess marks .js immutable for a
+   year, so the URL must change when the bytes do. Each script is copied to a
+   hashed name and the reference rewritten. */
+/* remove previously hashed copies — otherwise every content change leaves its
+   predecessor behind and dist/ grows forever with dead weight */
+const pruneHashed = (dir, keep) => {
+  for (const f of fs.readdirSync(dir)) {
+    if (/\.(?:min\.)?[a-f0-9]{10}\.(?:css|js)$/.test(f) && !keep.includes(f)) {
+      fs.unlinkSync(path.join(dir, f));
+    }
+  }
+};
+pruneHashed(path.dirname(cssFile), [path.basename(CSS_HASHED)]);
+
+const JS_DIR = path.join(ROOT, 'public', 'assets', 'js');
+const created = [];
+for (const name of fs.readdirSync(JS_DIR).filter((f) => f.endsWith('.js') && !/\.[a-f0-9]{10}\.js$/.test(f))) {
+  const src = path.join(JS_DIR, name);
+  const buf = fs.readFileSync(src);
+  const hash = crypto.createHash('sha256').update(buf).digest('hex').slice(0, 10);
+  const hashed = name.replace(/\.js$/, `.${hash}.js`);
+  fs.writeFileSync(path.join(JS_DIR, hashed), buf);
+  html = html.split(`/assets/js/${name}`).join(`/assets/js/${hashed}`);
+  created.push(hashed);
+}
+pruneHashed(JS_DIR, created);
 
 // drop the module-level defer attrs? no: scripts stay deferred for speed.
 // But make the "js-ready" class available immediately so reveals start hidden
