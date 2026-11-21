@@ -634,9 +634,13 @@ ul, ol { margin: 0; }
   background: rgba(4, 7, 10, 0.55);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  font-family: var(--font-mono);
-  font-size: 12px;              /* the phone size IS the base size */
-  letter-spacing: 0.03em;
+  /* Arabic label → Arabic face. IBM Plex Mono is a Latin-only subset, so the
+     badge was silently falling back to a different family. */
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13px;              /* the phone size IS the base size; Arabic
+                                   needs >=13px to hold its dots at 1x */
+  letter-spacing: 0;
   color: var(--paper-dim);
   margin-block-end: clamp(14px, 2.4vh, 22px);
 }
@@ -818,7 +822,8 @@ ul, ol { margin: 0; }
   .hero__title--h2 { font-size: clamp(3.4rem, 6.5vw, 5.6rem); }
   .hero__title .l2 { font-size: 0.42em; }
   .hero__lede { max-inline-size: 54ch; font-size: 1.08rem; }
-  .hero__badge { font-size: 12.5px; letter-spacing: 0.05em; }
+  .hero__badge { font-size: 13px; }
+  .hero__stat dt { font-size: 12px; }
   .hero__art img { object-position: 50% 42%; }
   .hero__shade {
     background:
@@ -1643,7 +1648,6 @@ ul, ol { margin: 0; }
      rather than shrinking, and let the label wrap if it must. */
   .hero__stats { gap: 0 10px; }
   .hero__stat dd { font-size: 17px; }
-  .hero__stat dt { font-size: 9px; letter-spacing: 0.02em; }
 
   .card__media { aspect-ratio: 16 / 11; }
   .convert__card { border-radius: var(--r-lg); padding: 22px 18px 24px; }
