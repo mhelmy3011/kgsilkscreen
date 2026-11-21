@@ -23,7 +23,8 @@ FONT900 = os.path.join(ROOT, "public/assets/fonts/alexandria-arabic-900-normal.t
 FONT700 = os.path.join(ROOT, "public/assets/fonts/alexandria-arabic-700-normal.ttf")
 FONT400 = os.path.join(ROOT, "public/assets/fonts/alexandria-arabic-400-normal.ttf")
 FONT400_LAT = os.path.join(ROOT, "public/assets/fonts/alexandria-latin-400-normal.ttf")
-SRC = os.path.join(ROOT, "assets-src/img/hero-ink.png")
+MARK_SVG = os.path.join(ROOT, "assets-src", "logo", "mark.svg")
+SRC = os.path.join(ROOT, "assets-src/img/slide-1-pull.png")
 OUT = os.path.join(ROOT, "public/assets/img/og.jpg")
 
 W, H = 1200, 630
@@ -34,7 +35,13 @@ INK = (4, 7, 10)
 
 
 class Text:
-    """A shaped, measurable Arabic/English run."""
+    """A shaped, measurable Arabic/English run.
+
+    This class only *measures* and shapes; rasterisation lives in
+    draw_shaped() below, which takes one of these and paints it. (An earlier
+    Text.draw() stub raised NotImplementedError because it never learned to
+    cache glyph bitmaps — it has been removed rather than left as a trap.)
+    """
 
     def __init__(self, font_path, size):
         self.size = size
@@ -58,10 +65,34 @@ class Text:
         infos, pos = self.shape(text)
         return sum(p.x_advance for p in pos) * self.scale, self.size
 
-    def draw(self, img, x_right, baseline):
-        """Draw right-aligned at x_right. Glyph outline cached as bitmaps."""
-        infos, pos = self.shape("".join([]))  # placeholder to keep API symmetric
-        raise NotImplementedError
+
+
+def mark_image(svg_path, size):
+    """Rasterise the brand mark SVG to an RGBA tile at `size` px.
+
+    Reuses the project's own flattener (scripts/svgflat.py) instead of a second
+    renderer, so the OG card and the favicon can never disagree about the logo.
+    """
+    import re as _re
+    import sys as _sys
+
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from svgflat import flatten
+
+    doc = open(svg_path, encoding="utf-8").read()
+    vb = _re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', doc)
+    vw = float(vb.group(1)) if vb else 48.0
+    sc = size / vw
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img, "RGBA")
+    for m in _re.finditer(r'<path d="([^"]+)" fill="([^"]+)"', doc):
+        dm, fm = m.group(1), m.group(2)
+        h = fm.lstrip("#")
+        col = tuple(int(h[i:i + 2], 16) for i in (0, 2, 4)) + (255,)
+        for poly in flatten(dm, steps=20, scale=sc, ox=0, oy=0, flip=1):
+            if len(poly) >= 3:
+                d.polygon(poly, fill=col)
+    return img
 
 
 def shaped_runs(text_obj, text):
@@ -136,24 +167,38 @@ def main():
         dv.line([(0, y), (W, y)], fill=(2, 4, 6, a))
     bg = Image.alpha_composite(bg, vig)
 
-    # ---- logo tile ----
+    # ---- brand mark: the real K/G logo, not a letter in a coloured tile ----
+    # The tile was a stand-in from before the identity existed. The actual mark
+    # is two-tone filled geometry, so it is rendered from the same SVG the site
+    # ships and composited directly on the photograph.
     PAD = 72
     RIGHT = W - PAD
-    tile = Image.new("RGBA", (60, 60), (0, 0, 0, 0))
-    ImageDraw.Draw(tile).rounded_rectangle([0, 0, 59, 59], 17, fill=(255, 116, 60, 255))
-    bg.alpha_composite(tile, (RIGHT - 60, 66))
+    bg.alpha_composite(mark_image(MARK_SVG, 64), (RIGHT - 64, 62))
 
-    f_logo = Text(FONT900, 30)
-    k_w = sum(p.x_advance for p in f_logo.shape("ك")[1]) * f_logo.scale
-    draw_shaped(bg, f_logo, "ك", RIGHT - 30 + k_w / 2, 66 + 42, (26, 11, 4, 255))
-
-    # the font is subset per script, so Latin and Arabic are drawn as two runs
+    # ---- venue + domain line -------------------------------------------
+    # Measured problem: this line sat on the brightest part of the photograph
+    # and was effectively invisible at thumbnail size. Dim type over a bright,
+    # busy background always loses, so it gets its own dark plate — the same
+    # decision the hero uses (a gradient scrim under the copy), applied here as
+    # a soft pill so it reads as intentional rather than a band-aid.
     f_brand_lat = Text(FONT400_LAT, 21)
     f_brand_ar = Text(FONT400, 22)
-    lat_w = draw_shaped(bg, f_brand_lat, "kgsilkscreen.store", RIGHT - 76, 66 + 37, DIM)
     sep = Text(FONT400_LAT, 21)
-    sep_w = draw_shaped(bg, sep, "·", RIGHT - 76 - lat_w - 12, 66 + 37, (110, 130, 126, 255))
-    draw_shaped(bg, f_brand_ar, "أبو كبير، الشرقية", RIGHT - 76 - lat_w - sep_w - 22, 66 + 37, DIM)
+
+    lat_w = f_brand_lat.measure("kgsilkscreen.store")[0]
+    sep_w = sep.measure("·")[0]
+    ar_w = f_brand_ar.measure("أبو كبير، الشرقية")[0]
+    line_w = lat_w + 14 + sep_w + 14 + ar_w
+    line_right = RIGHT - 78
+    line_y = 66 + 37           # baseline
+    plate = [line_right - line_w - 20, line_y - 26, line_right + 12, line_y + 12]
+    glaze = Image.new("RGBA", bg.size, (0, 0, 0, 0))
+    ImageDraw.Draw(glaze).rounded_rectangle(plate, 14, fill=(4, 7, 10, 168))
+    bg = Image.alpha_composite(bg, glaze)
+
+    draw_shaped(bg, f_brand_lat, "kgsilkscreen.store", line_right, line_y, PAPER)
+    draw_shaped(bg, sep, "·", line_right - lat_w - 14, line_y, (110, 130, 126, 255))
+    draw_shaped(bg, f_brand_ar, "أبو كبير، الشرقية", line_right - lat_w - sep_w - 28, line_y, (198, 214, 210, 255))
 
     # ---- headline ----
     f_h1 = Text(FONT900, 100)
