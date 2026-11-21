@@ -86,10 +86,10 @@ if (missing.length) {
   process.exit(1);
 }
 
-// also assert the two Arabic weights the page relies on are declared
-for (const w of ['400', '700', '900']) {
-  const has = faces.some((f) => f.family === 'Alexandria' && f.weight === w && f.ranges.some(([a]) => a === 0x0600));
-  if (!has) console.log(`  ! Alexandria ${w} has no Arabic range declared`);
+// also assert the Arabic weights the page relies on are declared
+for (const w of ['400', '500', '700', '800', '900']) {
+  const has = faces.some((f) => f.family === 'Tajawal' && f.weight === w && f.ranges.some(([a]) => a === 0x0600));
+  if (!has) console.log(`  ! Tajawal ${w} has no Arabic range declared`);
 }
 
 console.log('\n✓ every rendered character is covered by a shipped font subset');

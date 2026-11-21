@@ -22,7 +22,7 @@
   'use strict';
 
   const KGS = (window.KGS = window.KGS || {});
-  const PHONE = '201000000000'; // keep in sync with data/business.js
+  const PHONE = '201019458080'; // keep in sync with data/business.js
 
   function setupQuoteBuilder() {
     const form = document.querySelector('[data-quote-builder]');
@@ -43,12 +43,12 @@
       const when = val('when');
       const lines = [
         'السلام عليكم كمال جادو،',
-        'عايز أعرف سعر الطباعة:',
-        `• النوع: ${kind}`,
-        `• الكمية: ${qty}`,
-        `• الميعاد: ${when}`,
+        'برجاء تسعير طلب طباعة سلك سكرين بالمواصفات التالية:',
+        `• نوع الشغل: ${kind}`,
+        `• الكمية المطلوبة: ${qty}`,
+        `• موعد الاستلام: ${when}`,
       ];
-      lines.push('', 'لو محتاج مقاس أو عدد ألوان معيّن هبعته في الشات.');
+      lines.push('', 'سأشارككم ملف التصميم والمقاسات وعدد الألوان المطلوبة.');
       return lines.join('\n');
     }
 
@@ -59,7 +59,7 @@
     function refresh() {
       send.setAttribute('href', target());
       if (summary) {
-        summary.textContent = `${val('kind')} · ${val('qty')} · ${val('when')} — كل اللي محتاجينه لعرض السعر.`;
+        summary.textContent = `${val('kind')} · ${val('qty')} · ${val('when')} — جاهز للإرسال على واتساب (01019458080).`;
       }
       form.setAttribute('data-ready', '1');
     }
