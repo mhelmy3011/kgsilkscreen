@@ -34,6 +34,7 @@
     depthTarget: 0,
     velocity: 0,       // px/frame smoothed
     scrollY: 0,
+    dt: 16.67,
     max: 1,
     time: 0,
     quality: saveData || slowNet ? 'low' : 'auto', // low | auto | reduced | off
@@ -53,6 +54,10 @@
   const progressBar = document.querySelector('[data-progress]');
   const nav = document.querySelector('[data-nav]');
   const docBody = document.body;
+  /* Optional per-frame subscribers. The whole page shares ONE rAF loop; a
+     module that needs scroll maths registers here instead of starting its own
+     loop, so two animated sections can never double the frame budget. */
+  const frameHooks = [];
 
   /* ------------------------------ perf guard ------------------------------ */
   const perf = {
@@ -94,6 +99,7 @@
     const dt = lastTime ? Math.min(64, now - lastTime) : 16.67;
     lastTime = now;
     state.time += dt * 0.001;
+    state.dt = dt;
 
     const y = window.scrollY || window.pageYOffset || 0;
     const rawVel = y - state.scrollY;
@@ -167,6 +173,7 @@
     }
 
     if (window.KGS.onFrame) window.KGS.onFrame(state);
+    for (let i = 0; i < frameHooks.length; i++) frameHooks[i](state);
     perf.sample(dt);
 
     rafId = requestAnimationFrame(frame);
@@ -246,6 +253,13 @@
       state.quality = q;
     },
     ar,
+    addFrame(fn) {
+      if (typeof fn === 'function' && !frameHooks.includes(fn)) frameHooks.push(fn);
+      return () => {
+        const i = frameHooks.indexOf(fn);
+        if (i > -1) frameHooks.splice(i, 1);
+      };
+    },
     // header height helper for anchor offsets
     anchorOffset: () => (nav ? nav.offsetHeight : 64) + 8,
   };

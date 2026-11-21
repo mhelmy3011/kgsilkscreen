@@ -80,19 +80,84 @@
   });
 
   /* ------------------------- 2. تفاعلات صغيرة ---------------------------- */
-  function setupCardGlow() {
+  /* Real 3D tilt, not a hover scale: the pointer position sets two rotation
+     customs on the card, which CSS composes into one translate3d+rotate3d.
+     Pointer only, hover-capable devices only, and the write is coalesced into
+     one rAF — a fast mouse can fire hundreds of pointermove events per frame
+     and style invalidation, not GPU, is what would cost. */
+  function setupCardTilt() {
     if (reduce || !window.matchMedia('(hover: hover)').matches) return;
     for (const card of document.querySelectorAll('[data-tilt]')) {
+      let queued = 0;
+      let nx = 0;
+      let ny = 0;
+
+      const reset = () => {
+        card.classList.remove('is-tilting');
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+      };
+
+      card.addEventListener('pointerenter', () => card.classList.add('is-tilting'), { passive: true });
       card.addEventListener(
         'pointermove',
         (e) => {
           const r = card.getBoundingClientRect();
-          card.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
-          card.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+          if (!r.width) return;
+          nx = (e.clientX - r.left) / r.width - 0.5;
+          ny = (e.clientY - r.top) / r.height - 0.5;
+          card.style.setProperty('--mx', `${(nx + 0.5) * 100}%`);
+          card.style.setProperty('--my', `${(ny + 0.5) * 100}%`);
+          if (queued) return;
+          queued = requestAnimationFrame(() => {
+            queued = 0;
+            card.style.setProperty('--ry', `${(nx * 7).toFixed(2)}deg`);
+            card.style.setProperty('--rx', `${(-ny * 7).toFixed(2)}deg`);
+          });
         },
         { passive: true }
       );
+      card.addEventListener('pointerleave', reset, { passive: true });
+      card.addEventListener('blur', reset, true);
     }
+  }
+
+  /* The hero plate sits a few pixels deeper than the copy. Pointer-driven, on
+     hover devices only; transform on the <picture> so the existing 8s Ken Burns
+     zoom on the <img> is untouched. */
+  function setupHeroDepth() {
+    const hero = document.querySelector('.hero');
+    if (!hero || reduce || !window.matchMedia('(hover: hover)').matches) return;
+    let queued = false;
+    let x = 0;
+    let y = 0;
+
+    const commit = () => {
+      queued = false;
+      hero.style.setProperty('--hx', x.toFixed(3));
+      hero.style.setProperty('--hy', y.toFixed(3));
+    };
+
+    hero.addEventListener(
+      'pointermove',
+      (e) => {
+        const r = hero.getBoundingClientRect();
+        if (!r.width) return;
+        x = (e.clientX - r.left) / r.width - 0.5;
+        y = (e.clientY - r.top) / r.height - 0.5;
+        if (!queued) {
+          queued = true;
+          requestAnimationFrame(commit);
+        }
+      },
+      { passive: true }
+    );
+
+    hero.addEventListener('pointerleave', () => {
+      x = 0;
+      y = 0;
+      commit();
+    }, { passive: true });
   }
 
   function setupDock() {
@@ -214,7 +279,8 @@
   /* ------------------------- 4. تشغيل ------------------------------------ */
   function boot() {
     startInk();
-    setupCardGlow();
+    setupCardTilt();
+    setupHeroDepth();
     setupDock();
     setupActiveNav();
     setupVitals();

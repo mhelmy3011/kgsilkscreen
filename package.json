@@ -12,7 +12,7 @@
     "start": "node server.js",
     "dev": "NODE_ENV=development node --watch server.js",
     "export": "node scripts/export-static.js",
-    "test": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/check-contrast.js && node scripts/check-a11y.js && node scripts/test-hero.js && node scripts/test-quote.js && node scripts/smoke.js",
+    "test": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/check-contrast.js && node scripts/check-a11y.js && node scripts/test-hero.js && node scripts/test-quote.js && node scripts/test-lab.js && node scripts/smoke.js",
     "seo": "node scripts/inject-jsonld.js",
     "build": "node scripts/logo-mark.js && node scripts/logo-lockup.js && node scripts/inline-brand.js && node scripts/inject-contact.js && node scripts/inject-jsonld.js && node scripts/build-images.js && node scripts/minify-css.js && node scripts/ssg.js && node scripts/export-static.js && node scripts/check-deploy.js",
     "images": "node scripts/build-images.js",
@@ -37,7 +37,8 @@
     "check:deploy": "node scripts/export-static.js && node scripts/check-deploy.js",
     "check:fonts": "node scripts/check-fonts.js",
     "check:firstview": "node scripts/check-firstview.js",
-    "check:cache": "node scripts/check-cache.js"
+    "check:cache": "node scripts/check-cache.js",
+    "test:lab": "node scripts/test-lab.js"
   },
   "dependencies": {
     "compression": "^1.7.4",

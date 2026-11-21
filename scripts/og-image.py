@@ -24,7 +24,7 @@ FONT700 = os.path.join(ROOT, "public/assets/fonts/alexandria-arabic-700-normal.t
 FONT400 = os.path.join(ROOT, "public/assets/fonts/alexandria-arabic-400-normal.ttf")
 FONT400_LAT = os.path.join(ROOT, "public/assets/fonts/alexandria-latin-400-normal.ttf")
 MARK_SVG = os.path.join(ROOT, "assets-src", "logo", "mark.svg")
-SRC = os.path.join(ROOT, "assets-src/img/slide-1-pull.png")
+SRC = os.path.join(ROOT, "assets-src/img/slide-1-pull.jpg")
 OUT = os.path.join(ROOT, "public/assets/img/og.jpg")
 
 W, H = 1200, 630

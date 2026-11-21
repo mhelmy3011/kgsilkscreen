@@ -32,7 +32,7 @@ p{position:relative;font-size:27px;font-weight:400;color:#c3d2ce;max-width:760px
 .tags{position:relative;display:flex;gap:10px;margin-top:26px}
 .tag{font-size:17px;padding:8px 16px;border:1px solid rgba(238,243,241,.28);border-radius:99px;color:#c3d2ce}
 </style></head><body>
-<img class="bg" src="file://${ROOT}/public/assets/img/hero-ink-1600.jpg" alt="">
+<img class="bg" src="file://${ROOT}/assets-src/img/slide-1-pull.jpg" alt="">
 <div class="grad"></div>
 <div class="row"><div class="logo">ك</div><div class="brand">kgsilkscreen.store · أبو كبير، الشرقية</div></div>
 <h1>كمال جادو <span>سلك سكرين</span></h1>
@@ -63,7 +63,7 @@ async function main() {
     // fallback: tinted hero crop, still on-brand, still a valid 1200×630 card
     const { execFileSync } = require('node:child_process');
     execFileSync('convert', [
-      path.join(ROOT, 'assets-src/img/hero-ink.png'),
+      path.join(ROOT, 'assets-src/img/slide-1-pull.jpg'),
       '-resize', '1200x630^', '-gravity', 'center', '-extent', '1200x630',
       '-brightness-contrast', '-12x6', '-quality', '84', OUT,
     ]);
