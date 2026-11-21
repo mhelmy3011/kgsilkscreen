@@ -7,10 +7,14 @@ function grab(name) {
   return m[1];
 }
 const FRAG = grab('FRAG');
-// mirror the exact runtime transform used in the module
-const FRAG1 = FRAG.replace('#version 300 es', '')
-  .replace('out vec4 outColor;', '')
-  .replace('outColor = vec4(col, 1.0);', 'gl_FragColor = vec4(col, 1.0);');
+
+// WebGL1 shim: read the ACTUAL transform out of the module rather than
+// re-implementing it here. The two copies drifted (this file still looked for
+// the old `outColor = vec4(col, 1.0);` line), so the lint failed on a shader
+// that was correct — and would have passed a broken one just as easily.
+const shim = /const FRAG1 = ([\s\S]*?);\n/.exec(src);
+if (!shim) throw new Error('cannot find the FRAG1 transform in kgs-ink.js');
+const FRAG1 = new Function('FRAG', `return ${shim[1]};`)(FRAG);
 
 const stripComments = (g) => g.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
 

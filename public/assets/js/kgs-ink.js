@@ -173,13 +173,23 @@
     float grain = hash21(gl_FragCoord.xy + fract(uTime) * 91.7) - 0.5;
     col += grain * 0.020;
 
-    outColor = vec4(col, 1.0);
+    /* ---- alpha for the fixed backdrop -------------------------------
+       The canvas now sits *behind* the 3-slide photographic hero, so in the
+       first viewport it must not be an opaque wall: it composites as a faint
+       ink tint over the hero's own scrim and lets the photograph through.
+       The handover is driven by the same uDepth that drives everything else,
+       so it reverses exactly on scroll-up with no extra state. By ~0.16 of the
+       page the hero is off-screen and the backdrop goes fully opaque. */
+    // 1 at the top of the page, 0 past ~16% scrolled. Both smoothstep edges
+    // MUST ascend — reversed edges are undefined in GLSL (see lint-shaders).
+    float reveal = 1.0 - smoothstep(0.055, 0.16, d);
+    outColor = vec4(col, clamp(reveal, 0.12, 1.0));
   }`;
 
   /* ------------------------- WebGL1 shim (older Androids) ------------------ */
   const FRAG1 = FRAG.replace('#version 300 es', '')
     .replace('out vec4 outColor;', '')
-    .replace('outColor = vec4(col, 1.0);', 'gl_FragColor = vec4(col, 1.0);');
+    .replace('outColor = vec4(col, clamp(reveal, 0.12, 1.0));', 'gl_FragColor = vec4(col, clamp(reveal, 0.12, 1.0));');
   const VERT1 = `attribute vec2 aPos; void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }`;
 
   const HEX = {
@@ -247,7 +257,11 @@
 
     try {
       gl = canvas.getContext('webgl2', {
-        alpha: false,
+        // alpha:true so the backdrop can composite over the hero photograph
+        // in the first viewport instead of replacing it (see the shader's
+        // reveal term). premultipliedAlpha:false keeps the colour correct.
+        alpha: true,
+        premultipliedAlpha: false,
         antialias: false,
         depth: false,
         stencil: false,
@@ -257,7 +271,8 @@
       isGL2 = Boolean(gl);
       if (!gl) {
         gl = canvas.getContext('webgl', {
-          alpha: false,
+          alpha: true,
+          premultipliedAlpha: false,
           antialias: false,
           depth: false,
           stencil: false,

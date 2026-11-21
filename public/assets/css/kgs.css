@@ -193,7 +193,11 @@ ul, ol { margin: 0; }
 .ink-stage {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  /* Behind the hero (z-index 2). The hero is now a full-bleed photographic
+     stage, so the shader is a *backdrop* for the reading sections below it —
+     the shader itself fades its alpha in as you leave the first viewport, so
+     the page still opens on a photograph rather than a canvas. */
+  z-index: 1;
   pointer-events: none;
   overflow: hidden;
 }
@@ -236,7 +240,10 @@ ul, ol { margin: 0; }
 .ink-grain {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  /* Was 60, i.e. above everything including the hero art — which meant a film
+     grain was being laid over the photography and the type. It belongs to the
+     ink backdrop, so it now sits with it at z-index 1. */
+  z-index: 1;
   pointer-events: none;
   opacity: 0.30;
   mix-blend-mode: overlay;
