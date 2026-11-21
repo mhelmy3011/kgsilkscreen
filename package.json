@@ -14,7 +14,7 @@
     "export": "node scripts/export-static.js",
     "test": "node scripts/check-logo.js && node scripts/check-mobile.js && node scripts/test-hero.js && node scripts/test-quote.js && node scripts/smoke.js",
     "seo": "node scripts/inject-jsonld.js",
-    "build": "node scripts/ssg.js && node scripts/inject-jsonld.js && node scripts/export-static.js",
+    "build": "node scripts/logo-mark.js && node scripts/logo-lockup.js && node scripts/inline-brand.js && node scripts/inject-contact.js && node scripts/inject-jsonld.js && node scripts/build-images.js && node scripts/minify-css.js && node scripts/ssg.js",
     "images": "node scripts/build-images.js",
     "og": "python3 scripts/og-image.py",
     "assets": "node scripts/build-images.js && node scripts/og-image.js",
@@ -30,7 +30,8 @@
     "check:mobile": "node scripts/check-mobile.js",
     "test:hero": "node scripts/test-hero.js",
     "brand": "node scripts/inline-brand.js",
-    "test:quote": "node scripts/test-quote.js"
+    "test:quote": "node scripts/test-quote.js",
+    "contact": "node scripts/inject-contact.js"
   },
   "dependencies": {
     "compression": "^1.7.4",
