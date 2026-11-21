@@ -10,26 +10,33 @@ const path = require('node:path');
 const biz = require('../data/business.js');
 
 const ROOT = path.join(__dirname, '..');
-const PAGES = ['public/index.html', 'public/concept-1/index.html', 'public/concept-2/index.html', 'public/concept-3/index.html'];
+const PAGES = ['public/index.html', 'public/hub.html', 'public/concept-1/index.html', 'public/concept-2/index.html', 'public/concept-3/index.html'];
 
 const ld = {
   '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
+  '@type': ['LocalBusiness', 'PrintShop'],
   '@id': `${biz.url}#business`,
   name: biz.nameAr,
   alternateName: biz.nameEn,
   description: biz.descriptionAr,
+  foundingDate: biz.foundingYear || '2010',
   url: biz.url,
-  telephone: biz.phoneE164,
+  telephone: biz.phoneSecondaryE164 ? [biz.phoneE164, biz.phoneSecondaryE164] : biz.phoneE164,
+  contactPoint: [
+    { '@type': 'ContactPoint', telephone: biz.phoneE164, contactType: 'sales', areaServed: 'EG', availableLanguage: ['ar-EG', 'ar'] },
+    ...(biz.phoneSecondaryE164
+      ? [{ '@type': 'ContactPoint', telephone: biz.phoneSecondaryE164, contactType: 'customer service', areaServed: 'EG', availableLanguage: ['ar-EG', 'ar'] }]
+      : []),
+  ],
   email: biz.email,
-  image: `${biz.url}/assets/og.jpg`,
+  image: `${biz.url}/assets/img/og.jpg`,
   priceRange: biz.priceRange,
   currenciesAccepted: 'EGP',
   paymentAccepted: 'Cash, Vodafone Cash, InstaPay, Bank transfer',
   areaServed: biz.areaServed.map((a) => ({ '@type': 'City', name: a })),
   address: {
     '@type': 'PostalAddress',
-    streetAddress: biz.streetAr,
+    ...(biz.streetAr ? { streetAddress: biz.streetAr } : {}),
     addressLocality: biz.cityAr,
     addressRegion: biz.regionAr,
     postalCode: biz.postalCode,
@@ -42,7 +49,7 @@ const ld = {
     opens: h.opens,
     closes: h.closes,
   })),
-  sameAs: biz.social,
+  ...(Array.isArray(biz.social) && biz.social.length ? { sameAs: biz.social } : {}),
   makesOffer: biz.services.map((s) => ({
     '@type': 'Offer',
     itemOffered: { '@type': 'Service', name: s.nameAr, description: s.descAr },

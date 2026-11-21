@@ -4,8 +4,9 @@
  * Copies the subset .woff2 files the page needs out of node_modules and into
  * public/assets/fonts, so the server never depends on node_modules at runtime.
  *
- * Alexandria (display + body, Arabic & Latin, 400/700/900) and IBM Plex Mono
- * (numerals + micro labels). Cairo is still used by the three concept pages.
+ * Tajawal (smooth humanist Arabic display + body, Arabic & Latin, 400/500/700/800/900)
+ * and IBM Plex Mono (numerals + micro labels). Cairo is still used by the three
+ * concept pages, and Alexandria is kept for offline brand-sheet/wordmark tooling.
  *
  * Also emits .ttf copies on demand for the offline OG renderer:
  *   node scripts/build-fonts.js --ttf
@@ -19,6 +20,7 @@ const OUT = path.join(ROOT, 'public/assets/fonts');
 fs.mkdirSync(OUT, { recursive: true });
 
 const WANT = [
+  ['@fontsource/tajawal', ['tajawal-arabic-{400,500,700,800,900}-normal.woff2', 'tajawal-latin-{400,500,700,800,900}-normal.woff2']],
   ['@fontsource/alexandria', ['alexandria-arabic-{400,700,900}-normal.woff2', 'alexandria-latin-{400,700,900}-normal.woff2']],
   ['@fontsource/ibm-plex-mono', ['ibm-plex-mono-latin-{400,500}-normal.woff2']],
   ['@fontsource/cairo', ['cairo-arabic-{400,700,900}-normal.woff2', 'cairo-latin-{400,700,900}-normal.woff2']],

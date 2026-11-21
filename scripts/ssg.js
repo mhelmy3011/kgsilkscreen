@@ -194,7 +194,14 @@ function collapseHtml(src) {
   const keep = [];
   const stash = (m) => `\u0000${keep.push(m) - 1}\u0000`;
   let out = src
-    .replace(/<!--(?!\[if)[\s\S]*?-->/g, stash)
+    .replace(/<!--(?!\[if)[\s\S]*?-->/g, '')
+    .replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi, (_, json) => {
+      try {
+        return stash(`<script type="application/ld+json">${JSON.stringify(JSON.parse(json))}</script>`);
+      } catch {
+        return stash(`<script type="application/ld+json">${json}</script>`);
+      }
+    })
     .replace(/<(pre|textarea|script|style)\b[\s\S]*?<\/\1>/gi, stash);
   out = out.replace(/>\s+</g, '><').replace(/\s{2,}/g, ' ');
   // restore in reverse so indices stay valid

@@ -124,7 +124,7 @@ function minify(input) {
 
   css = css
     .replace(/\s+/g, ' ')
-    .replace(/\s*([{};:>,~+])\s*/g, '$1')
+    .replace(/\s*([{};:>,~])\s*/g, '$1')
     .replace(/;}/g, '}')
     .replace(/@media\s*\(/g, '@media(')
     .trim();

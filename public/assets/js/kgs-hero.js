@@ -47,12 +47,14 @@
     const position = () => Math.abs(railEl.scrollLeft);
 
     function slideStart(i) {
-      // offsetLeft is measured from the rail's inline start in visual order,
-      // which flips with `direction`, so translate it into scroll distance.
-      const el = slides[i];
-      const base = Math.min(...slides.map((s) => s.offsetLeft));
-      const dist = Math.abs(el.offsetLeft - base);
-      return dist;
+      // Measure from slide 0 (inline-start edge in both LTR and RTL).
+      // In RTL Chrome/Firefox/Safari, scrollLeft=0 is slide 0 (farthest right)
+      // and slides 1, 2 move negatively (-W, -2W).
+      if (slides[0] && slides[i]) {
+        const dist = Math.abs(slides[i].offsetLeft - slides[0].offsetLeft);
+        if (dist > 0 || i === 0) return dist;
+      }
+      return i * railEl.clientWidth;
     }
 
     function goTo(i, { smooth = true } = {}) {
@@ -175,7 +177,10 @@
     let rt = null;
     window.addEventListener('resize', () => {
       clearTimeout(rt);
-      rt = setTimeout(() => goTo(index, { smooth: false }), 150);
+      rt = setTimeout(() => {
+        const target = slideStart(index);
+        if (Math.abs(position() - target) > 2) goTo(index, { smooth: false });
+      }, 150);
     }, { passive: true });
 
     // A slide whose image is still lazy must not shift the rail once it lands.

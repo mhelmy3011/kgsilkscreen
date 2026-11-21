@@ -13,8 +13,10 @@
  *   6. Arabic-Indic numerals and Arabic text survive encoding round-trip.
  */
 const { JSDOM, VirtualConsole } = require('jsdom');
+const biz = require('../data/business.js');
 
 const BASE = process.env.BASE || 'http://127.0.0.1:3000';
+const WA = biz.whatsapp.replace(/\D/g, '');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let failures = 0;
@@ -59,7 +61,7 @@ const check = (ok, label, detail = '') => {
   check(sets.length === 3, 'three steps', `got ${sets.length}`);
   const send = doc.querySelector('[data-qb-send]');
   check(!!send, 'send button exists');
-  check(/^https:\/\/wa\.me\/201000000000\?text=/.test(send.getAttribute('href') || ''),
+  check(new RegExp(`^https:\\/\\/wa\\.me\\/${WA}\\?text=`).test(send.getAttribute('href') || ''),
     'button has a working default WhatsApp href before any JS');
 
   for (const n of ['kind', 'qty', 'when']) {
@@ -89,7 +91,7 @@ const check = (ok, label, detail = '') => {
   const href = send.getAttribute('href');
   const text = decodeURIComponent(href.split('text=')[1] || '');
 
-  check(href.startsWith('https://wa.me/201000000000?text='), 'href still points at the workshop WhatsApp number');
+  check(href.startsWith(`https://wa.me/${WA}?text=`), 'href still points at the workshop WhatsApp number');
   check(text.includes('يونيفورم مدارس أو شركات'), 'message carries the chosen product type');
   check(text.includes('١٠٠–٥٠٠ قطعة'), 'message carries the chosen quantity in Arabic-Indic numerals');
   check(text.includes('خلال أسبوع'), 'message carries the chosen timing');

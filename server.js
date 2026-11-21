@@ -86,7 +86,7 @@ app.get('/', (req, res, next) => {
     : '/assets/css/kgs.css';
   res.setHeader(
     'Link',
-    `<${sheet}>; rel=preload; as=style, </assets/fonts/alexandria-arabic-900-normal.woff2>; rel=preload; as=font; type=font/woff2; crossorigin`
+    `<${sheet}>; rel=preload; as=style, </assets/fonts/tajawal-arabic-900-normal.woff2>; rel=preload; as=font; type=font/woff2; crossorigin`
   );
   fs.readFile(file, 'utf8', (err, html) => {
     if (err) return next(err);
