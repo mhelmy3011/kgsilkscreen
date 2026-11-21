@@ -1,7 +1,9 @@
 node_modules/
 dist/
-data/
 npm-debug.log*
+# data/ is the single source of truth for NAP and JSON-LD — it MUST be tracked,
+# otherwise a fresh clone (and Hostinger's deploy) cannot build.
+
 .DS_Store
 .env
 .env.*
