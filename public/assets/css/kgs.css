@@ -484,39 +484,137 @@ ul, ol { margin: 0; }
 .chip--hot { border-color: rgba(255, 90, 31, 0.45); background: rgba(255, 90, 31, 0.12); color: #ffc2a3; }
 
 /* ------------------------------- 8. الهيرو ------------------------------- */
+/*
+  MOBILE-FIRST — this is the rule the whole project is built around.
+
+  The hero is a native CSS scroll-snap rail: three full-screen slides, swiped
+  with the OS's own inertia, no JS carousel. Why that decision matters on a
+  phone:
+
+  · A JS carousel has to re-implement momentum, and it always feels slightly
+    wrong next to the rest of the OS. Snapping lets the platform do it.
+  · `overscroll-behavior-x: contain` means a horizontal swipe never yanks the
+    page vertically, and a vertical scroll never half-moves the slide.
+  · It works with JS disabled, keyboard, and screen readers, because the slides
+    are ordinary articles in DOM order.
+  · Height is fixed in svh/dvh, so the browser never has to re-layout on load
+    and CLS stays at 0.
+
+  Desktop is the *enhancement*: same markup, slides animate in place.
+*/
+
 .hero {
   position: relative;
   z-index: 2;
-  min-block-size: 100svh;
+  /* svh is the small viewport: the hero fits when the address bar is visible,
+     so the first slide's CTA is never pushed below the fold. */
+  block-size: 100svh;
+  min-block-size: 34rem;
+  max-block-size: 60rem;
+  overflow: clip;
+  isolation: isolate;
+}
+
+/* the rail */
+.hero__rail {
+  display: flex;
+  block-size: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+.hero__rail::-webkit-scrollbar { display: none; }
+@media (prefers-reduced-motion: reduce) { .hero__rail { scroll-behavior: auto; } }
+
+.hero__slide {
+  position: relative;
+  flex: 0 0 100%;
+  block-size: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
   display: grid;
-  align-content: center;
-  padding: calc(var(--nav-h) + clamp(40px, 9vh, 90px)) var(--gutter) clamp(56px, 9vh, 96px);
+  align-content: end;
+  isolation: isolate;
   overflow: hidden;
 }
-.hero__inner {
-  width: 100%;
-  max-width: var(--maxw);
-  margin-inline: auto;
+
+/* the dedicated background art for this slide */
+.hero__art {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  z-index: -2;
 }
+.hero__art picture { display: block; block-size: 100%; }
+.hero__art img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  /* portrait art is composed with its subject high, copy sits low */
+  object-position: 50% 28%;
+  opacity: 0.66;
+  transform: scale(1.06);
+  transition: transform 8s var(--ease-out), opacity 1.2s ease;
+}
+.hero__slide.is-active .hero__art img { transform: scale(1); opacity: 0.78; }
+@media (prefers-reduced-motion: reduce) {
+  .hero__art img, .hero__slide.is-active .hero__art img { transition: none; transform: none; }
+}
+
+/* the ink shade: makes white text readable over any photograph, and becomes
+   the "drowning in ink" gradient that the scroll motion reverses */
+.hero__shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to top, var(--ink-1) 4%, rgba(7, 13, 18, 0.94) 26%, rgba(7, 13, 18, 0.62) 52%, rgba(7, 13, 18, 0.2) 78%, rgba(7, 13, 18, 0.42) 100%),
+    radial-gradient(120% 60% at 50% 100%, rgba(255, 90, 31, 0.14), transparent 70%);
+}
+
+.hero__inner {
+  inline-size: 100%;
+  max-inline-size: var(--maxw);
+  margin-inline: auto;
+  padding: calc(var(--nav-h) + 12px) var(--gutter) clamp(22px, 4vh, 46px);
+}
+
+.hero__copy {
+  max-inline-size: 38ch;   /* mobile measure: never a long line */
+  display: grid;
+  justify-items: start;
+}
+
+/* --- per-slide copy ------------------------------------------------------ */
 .hero__badge {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 7px 15px 7px 11px;
+  gap: 8px;
+  padding: 6px 13px 6px 10px;
   border-radius: 999px;
   border: 1px solid var(--line-strong);
-  background: rgba(4, 7, 10, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  font-size: 12px;
+  background: rgba(4, 7, 10, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
   color: var(--paper-dim);
-  margin-block-end: clamp(20px, 3.5vh, 32px);
+  margin-block-end: clamp(14px, 2.4vh, 22px);
 }
 .hero__badge i {
-  width: 7px; height: 7px; border-radius: 50%;
+  inline-size: 6px; block-size: 6px; border-radius: 50%;
   background: #37e6a0;
   box-shadow: 0 0 0 4px rgba(55, 230, 160, 0.16);
-  animation: pulse-dot 2.4s ease-in-out infinite;
+  flex: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero__badge i { animation: pulse-dot 2.6s ease-in-out infinite; }
 }
 @keyframes pulse-dot {
   0%, 100% { box-shadow: 0 0 0 4px rgba(55, 230, 160, 0.16); }
@@ -524,32 +622,29 @@ ul, ol { margin: 0; }
 }
 
 .hero__title {
-  font-size: clamp(52px, 11.5vw, 168px);
-  line-height: 0.88;
-  letter-spacing: -0.045em;
-  margin-block-end: 0;
+  font-size: clamp(2.5rem, 12.5vw, 6rem);   /* 40px @360 → 96px */
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  margin: 0;
 }
 .hero__title span { display: block; }
+.hero__title .l1 { color: var(--paper); }
 .hero__title .l2 {
-  font-size: 0.40em;
-  letter-spacing: 0.02em;
+  font-size: 0.52em;
+  letter-spacing: -0.01em;
   font-weight: 700;
-  color: var(--paper-dim);
-  margin-block-start: 0.16em;
+  color: var(--pigment);
+  margin-block-start: 0.1em;
 }
-.hero__title .l1 {
-  background: linear-gradient(178deg, #ffffff 20%, rgba(238, 243, 241, 0.55) 74%, rgba(94, 234, 212, 0.5) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+.hero__title--h2 { font-size: clamp(2rem, 9.5vw, 4rem); }
+.hero__title--h2 .l2 { font-size: 0.62em; color: var(--paper-dim); }
 
 .hero__lede {
-  max-width: 46ch;
-  margin-block-start: clamp(18px, 3vh, 28px);
-  font-size: clamp(15px, 1.35vw, 19px);
+  max-inline-size: 36ch;
+  margin-block-start: clamp(12px, 2.2vh, 20px);
+  font-size: 1rem;            /* 16px floor — iOS zooms below 16px on focus */
+  line-height: 1.72;
   color: var(--paper-dim);
-  line-height: 1.85;
 }
 .hero__lede b { color: var(--paper); font-weight: 700; }
 
@@ -557,53 +652,109 @@ ul, ol { margin: 0; }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  margin-block-start: clamp(24px, 4vh, 36px);
+  gap: 10px;
+  inline-size: 100%;
+  margin-block-start: clamp(16px, 3vh, 26px);
+}
+/* On the phone the primary action is full-bleed-thumb-sized, and the
+   secondary link sits under it rather than competing beside it. */
+@media (max-width: 430px) {
+  .hero__cta { flex-direction: column; align-items: stretch; }
+  .hero__cta .btn { inline-size: 100%; justify-content: center; }
 }
 
 .hero__stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 2px;
-  margin-block-start: clamp(30px, 5.5vh, 54px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 14px;
+  inline-size: 100%;
+  margin: clamp(16px, 3vh, 28px) 0 0;
+  padding-block-start: 14px;
   border-block-start: 1px solid var(--line);
-  padding-block-start: clamp(18px, 3vh, 26px);
-  max-width: 720px;
 }
-@media (min-width: 760px) { .hero__stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .hero__stat dt {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
   color: var(--paper-mute);
-  margin-block-end: 5px;
+  margin-block-end: 3px;
 }
 .hero__stat dd {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(21px, 2.3vw, 30px);
+  font-size: clamp(1rem, 4.2vw, 1.5rem);
   letter-spacing: -0.02em;
   color: var(--paper);
+  line-height: 1.2;
 }
-.hero__stat dd small { font-size: 0.55em; font-weight: 700; color: var(--paper-mute); margin-inline-start: 2px; }
+.hero__stat dd small {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--paper-mute);
+  margin-block-start: 2px;
+}
+
+/* --- controls ------------------------------------------------------------ */
+/* Arrows are a desktop affordance: on touch the swipe IS the control, and
+   arrows over the photo only steal space from the copy. */
+.hero__arrow { display: none; }
+
+.hero__dots {
+  position: absolute;
+  inset-block-end: max(12px, env(safe-area-inset-bottom));
+  inset-inline: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  /* buttons are 44px tall for the thumb; the visible bar stays 3px */
+  padding: 0;
+}
+.hero__dots button {
+  inline-size: 34px;
+  block-size: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hero__dots button span {
+  inline-size: 100%;
+  block-size: 3px;
+  border-radius: 999px;
+  background: rgba(238, 243, 241, 0.22);
+  transition: background 0.35s ease, transform 0.35s var(--ease-out);
+  transform: scaleY(1);
+}
+.hero__dots button.is-active span { background: var(--pigment); transform: scaleY(2); }
+.hero__dots button:focus-visible { outline: 2px solid var(--cyan-soft); outline-offset: -6px; border-radius: 8px; }
 
 .hero__scroll {
-  display: flex;
+  position: absolute;
+  inset-block-end: clamp(20px, 4vh, 40px);
+  inset-inline-start: var(--gutter);
+  z-index: 3;
+  display: none;
   align-items: center;
-  gap: 12px;
-  margin-block-start: clamp(26px, 4.5vh, 42px);
+  gap: 10px;
+  margin: 0;
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
   color: var(--paper-mute);
+  writing-mode: horizontal-tb;
 }
 .hero__scroll i {
   position: relative;
   display: block;
-  width: 1px; height: 44px;
+  inline-size: 1px; block-size: 32px;
   background: linear-gradient(to bottom, var(--cyan-soft), transparent);
   overflow: hidden;
 }
@@ -611,70 +762,68 @@ ul, ol { margin: 0; }
   content: "";
   position: absolute;
   inset-inline: 0;
-  height: 14px;
+  block-size: 12px;
   background: var(--cyan-soft);
   animation: scroll-drip 2.4s var(--ease-in-out) infinite;
 }
 @keyframes scroll-drip {
-  0% { inset-block-start: -14px; opacity: 0; }
+  0% { inset-block-start: -12px; opacity: 0; }
   25% { opacity: 1; }
-  100% { inset-block-start: 44px; opacity: 0; }
+  100% { inset-block-start: 32px; opacity: 0; }
 }
 
-/* hero split: text + photo */
-.hero__grid {
-  display: grid;
-  gap: clamp(26px, 4vw, 48px);
-  align-items: center;
-}
-@media (min-width: 1040px) {
-  .hero__grid { grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.78fr); }
+/* --- desktop: same slides, now as a full-bleed stage with arrows --------- */
+@media (min-width: 900px) {
+  .hero { max-block-size: none; }
+  .hero__slide { align-content: center; }
+  .hero__inner {
+    padding-block: calc(var(--nav-h) + 40px) clamp(60px, 9vh, 110px);
+  }
+  .hero__copy { max-inline-size: 46ch; }
+  .hero__title { font-size: clamp(4.4rem, 8.5vw, 7.5rem); line-height: 0.94; }
+  .hero__title--h2 { font-size: clamp(3.4rem, 6.5vw, 5.6rem); }
+  .hero__title .l2 { font-size: 0.42em; }
+  .hero__lede { max-inline-size: 54ch; font-size: 1.08rem; }
+  .hero__art img { object-position: 50% 42%; }
+  .hero__shade {
+    background:
+      linear-gradient(to left, rgba(7, 13, 18, 0.97) 0%, rgba(7, 13, 18, 0.88) 32%, rgba(7, 13, 18, 0.35) 62%, rgba(7, 13, 18, 0.1) 100%),
+      linear-gradient(to top, rgba(7, 13, 18, 0.9), transparent 55%);
+  }
+  /* RTL desktop: copy on the right, art breathing on the left */
+  .hero__copy { justify-items: start; }
+  .hero__stats { grid-template-columns: repeat(3, minmax(0, 1fr)); max-inline-size: 560px; }
+  .hero__scroll { display: flex; }
+  .hero__dots { inset-block-end: 26px; }
+
+  .hero__arrow {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    inset-block-start: 50%;
+    translate: 0 -50%;
+    z-index: 4;
+    inline-size: 46px; block-size: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    background: rgba(4, 7, 10, 0.55);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    color: var(--paper);
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+  }
+  .hero__arrow svg { inline-size: 18px; block-size: 18px; }
+  .hero__arrow:hover { background: rgba(255, 90, 31, 0.9); border-color: transparent; }
+  .hero__arrow:disabled { opacity: 0.25; cursor: default; }
+  .hero__arrow:disabled:hover { background: rgba(4, 7, 10, 0.55); border-color: var(--line-strong); }
+  .hero__arrow--prev { inset-inline-end: 18px; }
+  .hero__arrow--next { inset-inline-start: 18px; }
 }
 
-.hero__media {
-  position: relative;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  border: 1px solid var(--line-strong);
-  box-shadow: var(--shadow-2);
-  aspect-ratio: 4 / 5;
-  max-height: 560px;
-  isolation: isolate;
-}
-@media (max-width: 1039px) { .hero__media { display: none; } }
-.hero__media img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  opacity: calc(0.55 + 0.45 * var(--p, 1));
-  transform: scale(calc(1.12 - 0.12 * var(--p, 1)));
-}
-.hero__media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(4, 7, 10, 0.1) 0%, rgba(4, 7, 10, 0.55) 62%, rgba(4, 7, 10, 0.95) 100%);
-  pointer-events: none;
-}
-.hero__media figcaption {
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline: 0;
-  z-index: 2;
-  padding: 22px;
-  display: grid;
-  gap: 6px;
-}
-.hero__media figcaption b {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
-}
-.hero__media figcaption span {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--paper-mute);
+/* huge screens: don't let the photograph stretch into mush */
+@media (min-width: 1600px) {
+  .hero__title { font-size: 8.2rem; }
 }
 
 /* depth HUD */

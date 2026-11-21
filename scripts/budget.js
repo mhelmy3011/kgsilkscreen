@@ -12,21 +12,45 @@ const { execFile } = require('node:child_process');
 
 const BASE = process.argv[2] || process.env.BASE || 'http://127.0.0.1:3000';
 
-// Budgets are per-viewport. A 360px phone is what matters in Egypt, so that is
-// the strict case; desktop is allowed the bigger hero crop.
+// Budgets are per-viewport, and per-resource so a regression is traceable to
+// the file that caused it. A first view is: the document, the CSS that gates
+// paint, the two Arabic faces that render above the fold, the JS that is
+// deferred, and the ONE image the browser is told to prioritise.
+//
+// Slides 2 and 3 are absent on purpose — they are `loading=lazy`, so they are
+// not part of the first view on either device. If they ever appear here, it
+// means someone removed the lazy attribute and broke the LCP budget.
 const BUDGETS = {
   mobile360: {
-    label: 'Mobile 360×800 · first view',
-    maxKB: 260,
-    assets: ['/', '/assets/css/kgs.min.css', '/assets/js/kgs-ink.js', '/assets/js/kgs-engine.js', '/assets/js/kgs-page.js',
-      '/assets/fonts/alexandria-arabic-900-normal.woff2', '/assets/fonts/alexandria-arabic-400-normal.woff2'],
+    label: 'Mobile 360x800 · first view',
+    maxKB: 110,
+    perAsset: {
+      '/': 17,
+      '/assets/css/kgs.min.css': 9,
+      '/assets/js/kgs-hero.js': 2.5,
+      '/assets/js/kgs-page.js': 3.5,
+      '/assets/js/kgs-engine.js': 3.5,
+      '/assets/js/kgs-ink.js': 5,
+      '/assets/fonts/alexandria-arabic-900-normal.woff2': 13,
+      '/assets/fonts/alexandria-arabic-400-normal.woff2': 13,
+      // the LCP image at 360w AVIF — plan target was <= 42 KB
+      '/assets/img/slide-1-pull-360.avif': 42,
+    },
+    assets: ['/', '/assets/css/kgs.min.css', '/assets/js/kgs-hero.js', '/assets/js/kgs-page.js',
+      '/assets/js/kgs-engine.js', '/assets/js/kgs-ink.js',
+      '/assets/fonts/alexandria-arabic-900-normal.woff2',
+      '/assets/fonts/alexandria-arabic-400-normal.woff2',
+      '/assets/img/slide-1-pull-360.avif'],
   },
   desktop: {
-    label: 'Desktop 1440×900 · first view',
-    maxKB: 420,
-    assets: ['/', '/assets/css/kgs.min.css', '/assets/js/kgs-ink.js', '/assets/js/kgs-engine.js', '/assets/js/kgs-page.js',
-      '/assets/fonts/alexandria-arabic-900-normal.woff2', '/assets/fonts/alexandria-arabic-400-normal.woff2',
-      '/assets/img/hero-ink-1024.avif'],
+    label: 'Desktop 1440x900 · first view',
+    maxKB: 190,
+    perAsset: { '/assets/img/slide-1-pull-720.avif': 60 },
+    assets: ['/', '/assets/css/kgs.min.css', '/assets/js/kgs-hero.js', '/assets/js/kgs-page.js',
+      '/assets/js/kgs-engine.js', '/assets/js/kgs-ink.js',
+      '/assets/fonts/alexandria-arabic-900-normal.woff2',
+      '/assets/fonts/alexandria-arabic-400-normal.woff2',
+      '/assets/img/slide-1-pull-720.avif'],
   },
 };
 
@@ -56,8 +80,14 @@ async function weigh(path) {
     for (const a of b.assets) rows.push(await weigh(a));
     const total = rows.reduce((s, r) => s + r.bytes, 0);
     const kb = total / 1024;
-    const ok = kb <= b.maxKB && rows.every((r) => r.status === 200);
+    const over = rows.filter((r) => b.perAsset?.[r.path] && r.bytes / 1024 > b.perAsset[r.path]);
+    const ok = kb <= b.maxKB && rows.every((r) => r.status === 200) && !over.length;
     if (!ok) fail++;
+    if (over.length) {
+      for (const r of over) {
+        console.log(`  ! ${r.path} is ${(r.bytes / 1024).toFixed(1)} KB (limit ${b.perAsset[r.path]} KB)`);
+      }
+    }
     console.log(`\n${ok ? '✓' : '✗'} ${b.label} — ${kb.toFixed(1)} KB / budget ${b.maxKB} KB`);
     for (const r of rows) {
       console.log(`    ${(r.bytes / 1024).toFixed(1).padStart(7)} KB  ${r.path}${r.enc !== 'none' ? '  (' + r.enc + ')' : ''}`);

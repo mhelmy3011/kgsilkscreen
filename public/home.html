@@ -95,72 +95,166 @@
 <main id="main">
 
 <!-- ======================== ١. الغرق ======================== -->
-<section class="hero" id="top" aria-labelledby="hero-title">
-  <div class="hero__inner">
-    <div class="hero__grid">
-      <div>
-        <p class="hero__badge hero-in hero-in--1">
-          <i aria-hidden="true"></i>
-          الورشة مفتوحة للطلبات — أبو كبير، الشرقية
-        </p>
+<section class="hero" id="top" aria-labelledby="hero-title" data-autoplay="0">
+  <div class="hero__rail" data-rail role="group" aria-roledescription="سلايدر" aria-label="ثلاث لقطات من الورشة">
 
-        <h1 class="hero__title hero-in hero-in--2" id="hero-title" data-reveal="fade" data-stagger-group>
-          <span class="l1"><span data-stagger>كمال</span> <span data-stagger>جادو</span></span>
-          <span class="l2" data-stagger>سلك سكرين</span>
-        </h1>
-
-        <p class="hero__lede hero-in hero-in--3">
-          الطباعة عندنا مش صورة على قطعة. هي <b>حبر بيدخل خيوط القماش</b> ويقعد جواها.
-          من التيشيرت اللي بتلبسه لليافطة اللي على المحل — بنطبع بإيد حد عارف هو بيعمل إيه،
-          وسعرك بيبقى نهائي قبل ما نلمس الشاشة.
-        </p>
-
-        <div class="hero__cta hero-in hero-in--4">
-          <a class="btn btn--primary btn--lg" href="https://wa.me/201000000000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%83%D9%85%D8%A7%D9%84%20%D8%AC%D8%A7%D8%AF%D9%88%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B9%D8%B1%D9%81%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B3%D9%84%D9%83%20%D8%B3%D9%83%D8%B1%D9%8A%D9%86" target="_blank" rel="noopener" data-cta="hero-whatsapp">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s-.5-.2-.7.1-.8 1-1 1.2-.4.2-.7.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.5-.6.3-.5v-.5l-1-2.3c-.2-.5-.4-.5-.6-.5h-.6c-.2 0-.5.1-.8.4a3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 12.7 12.7 0 0 0 4.9 4.3 8.6 8.6 0 0 0 3.3.9 2.9 2.9 0 0 0 2.2-.8 2.6 2.6 0 0 0 .6-1.8c0-.2 0-.4-.2-.5M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2"/></svg>
-            اطلب عرض سعر على واتساب
-          </a>
-          <a class="btn btn--ghost btn--lg" href="#services">شوف الخدمات</a>
-        </div>
-
-        <dl class="hero__stats hero-in hero-in--5">
-          <div class="hero__stat">
-            <dt>سنين في الشغل</dt>
-            <dd><span data-count="15" data-prefix="+">+١٥</span><small>سنة</small></dd>
-          </div>
-          <div class="hero__stat">
-            <dt>قطعة كل شهر</dt>
-            <dd><span data-count="20000" data-prefix="+">+٢٠٠٠٠</span><small>قطعة</small></dd>
-          </div>
-          <div class="hero__stat">
-            <dt>أقصى عدد ألوان</dt>
-            <dd>٦<small>ألوان</small></dd>
-          </div>
-          <div class="hero__stat">
-            <dt>ميعاد التسليم</dt>
-            <dd>٢–٥<small>أيام</small></dd>
-          </div>
-        </dl>
-
-        <p class="hero__scroll hero-in hero-in--6">
-          <i aria-hidden="true"></i>
-          اسكرول لتحت — إنت بتنزل في الحبر
-        </p>
-      </div>
-
-      <figure class="hero__media" data-reveal="blur">
+    <article class="hero__slide is-active" data-slide aria-roledescription="سلايد" aria-label="١ من ٣">
+      <figure class="hero__art">
         <picture>
-          <source type="image/avif" srcset="/assets/img/hero-ink-640.avif 640w, /assets/img/hero-ink-1024.avif 1024w" sizes="(max-width: 1039px) 1px, 40vw" />
-          <source type="image/webp" srcset="/assets/img/hero-ink-640.webp 640w, /assets/img/hero-ink-1024.webp 1024w" sizes="(max-width: 1039px) 1px, 40vw" />
-          <img src="/assets/img/hero-ink-1024.jpg" width="1024" height="570" alt="شفرة معدنية تسحب شريط حبر كثيف على شاشة سلك سكرين، ونمط النقط النصفي بيظهر في فيلم الحبر" fetchpriority="high" decoding="async" />
-        </picture>
-        <figcaption>
-          <span>الصفحة ٠٠ · لحظة السحب</span>
-          <b>حبر + شفرة + ضغط متساوي — مفيش حاجة بتمشي لوحدها</b>
-        </figcaption>
+            <source type="image/avif" srcset="/assets/img/slide-1-pull-360.avif 360w, /assets/img/slide-1-pull-540.avif 540w, /assets/img/slide-1-pull-720.avif 720w" sizes="(max-width: 520px) 100vw, 540px" />
+            <source type="image/webp" srcset="/assets/img/slide-1-pull-360.webp 360w, /assets/img/slide-1-pull-540.webp 540w, /assets/img/slide-1-pull-720.webp 720w" sizes="(max-width: 520px) 100vw, 540px" />
+            <img src="/assets/img/slide-1-pull-540.jpg" width="896" height="1200" alt="شفرة سلك سكرين بتسحب شريط حبر كريمي على شبكة سوداء، والحد الفاصل بين الحبر والشبكة حاد جدًا" fetchpriority="high" decoding="async" />
+          </picture>
       </figure>
-    </div>
+      <div class="hero__shade" aria-hidden="true"></div>
+
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <p class="hero__badge hero-in hero-in--1">
+            <i aria-hidden="true"></i>
+            ورشة أبو كبير · محافظة الشرقية
+          </p>
+
+          <h1 class="hero__title hero-in hero-in--2" id="hero-title">
+            <span class="l1">كمال جادو</span>
+            <span class="l2">سلك سكرين</span>
+          </h1>
+
+          <p class="hero__lede hero-in hero-in--3">
+            <b>حبر بيدخل خيوط القماش ويقعد جواها</b> — مش صورة ملزوقة فوقه.
+            الطباعة عندنا شغل إيد، بس بمواعيد مكتوبة وسعر نهائي قبل ما نلمس الشاشة.
+          </p>
+
+          <div class="hero__cta hero-in hero-in--4">
+            <a class="btn btn--primary btn--lg" href="https://wa.me/201000000000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%83%D9%85%D8%A7%D9%84%20%D8%AC%D8%A7%D8%AF%D9%88%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B9%D8%B1%D9%81%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B3%D9%84%D9%83%20%D8%B3%D9%83%D8%B1%D9%8A%D9%86" target="_blank" rel="noopener" data-cta="hero-whatsapp">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s-.5-.2-.7.1-.8 1-1 1.2-.4.2-.7.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.5-.6.3-.5v-.5l-1-2.3c-.2-.5-.4-.5-.6-.5h-.6c-.2 0-.5.1-.8.4a3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 12.7 12.7 0 0 0 4.9 4.3 8.6 8.6 0 0 0 3.3.9 2.9 2.9 0 0 0 2.2-.8 2.6 2.6 0 0 0 .6-1.8c0-.2 0-.4-.2-.5M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2"/></svg>
+              اطلب عرض سعر على واتساب
+            </a>
+            <a class="btn btn--ghost btn--lg" href="#why">شوف الشغل</a>
+          </div>
+
+          <dl class="hero__stats hero-in hero-in--5">
+            <div class="hero__stat">
+              <dt>سنين في الشغل</dt>
+              <dd><span data-count="15" data-prefix="+">+١٥</span><small>سنة</small></dd>
+            </div>
+            <div class="hero__stat">
+              <dt>قطعة كل شهر</dt>
+              <dd><span data-count="20000" data-prefix="+">+٢٠٠٠٠</span><small>قطعة</small></dd>
+            </div>
+            <div class="hero__stat">
+              <dt>ميعاد التسليم</dt>
+              <dd>٢–٥<small>أيام</small></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </article>
+
+    <article class="hero__slide" data-slide aria-roledescription="سلايد" aria-label="٢ من ٣" aria-hidden="true">
+      <figure class="hero__art">
+        <picture>
+            <source type="image/avif" srcset="/assets/img/slide-2-workshop-360.avif 360w, /assets/img/slide-2-workshop-540.avif 540w, /assets/img/slide-2-workshop-720.avif 720w" sizes="(max-width: 520px) 100vw, 540px" />
+            <source type="image/webp" srcset="/assets/img/slide-2-workshop-360.webp 360w, /assets/img/slide-2-workshop-540.webp 540w, /assets/img/slide-2-workshop-720.webp 720w" sizes="(max-width: 520px) 100vw, 540px" />
+            <img src="/assets/img/slide-2-workshop-540.jpg" width="896" height="1200" alt="شاشات سلك سكرين خشبية متكومة على الحيطة الخرسانة في الورشة، وتذكرة شغل ورقية ملزوقة على كل شاشة، ولمبة دافية منورة على اليمين" loading="lazy" fetchpriority="low" decoding="async" />
+          </picture>
+      </figure>
+      <div class="hero__shade" aria-hidden="true"></div>
+
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <p class="hero__badge">
+            <i aria-hidden="true"></i>
+            الورشة · الفصل اللوني والحرق
+          </p>
+
+          <h2 class="hero__title hero__title--h2">
+            <span class="l1">كل لون</span>
+            <span class="l2">شاشة لوحده</span>
+          </h2>
+
+          <p class="hero__lede">
+            بنفصل، بنحرق، وبنعاير على أول <b>١٠ قطع</b> قبل ما نكمّل الكمية.
+            لو درجة اللون طلعت مختلفة، بنوقف ونظبط — مش بنسلّم ونسيب العميل يكتشف بنفسه.
+          </p>
+
+          <div class="hero__cta">
+            <a class="btn btn--primary btn--lg" href="#process">شوف خط الإنتاج</a>
+            <a class="btn btn--ghost btn--lg" href="tel:+201000000000" data-cta="hero-call">اتصل بينا</a>
+          </div>
+
+          <dl class="hero__stats">
+            <div class="hero__stat"><dt>أقصى عدد ألوان</dt><dd>٦<small>ألوان</small></dd></div>
+            <div class="hero__stat"><dt>البروفة</dt><dd>على قطعة<small>حقيقية</small></dd></div>
+            <div class="hero__stat"><dt>الفاتورة</dt><dd>رسمية<small>ومكتوبة</small></dd></div>
+          </dl>
+        </div>
+      </div>
+    </article>
+
+    <article class="hero__slide" data-slide aria-roledescription="سلايد" aria-label="٣ من ٣" aria-hidden="true">
+      <figure class="hero__art">
+        <picture>
+            <source type="image/avif" srcset="/assets/img/slide-3-ink-360.avif 360w, /assets/img/slide-3-ink-540.avif 540w, /assets/img/slide-3-ink-720.avif 720w" sizes="(max-width: 520px) 100vw, 540px" />
+            <source type="image/webp" srcset="/assets/img/slide-3-ink-360.webp 360w, /assets/img/slide-3-ink-540.webp 540w, /assets/img/slide-3-ink-720.webp 720w" sizes="(max-width: 520px) 100vw, 540px" />
+            <img src="/assets/img/slide-3-ink-540.jpg" width="896" height="1200" alt="ماكرو لشريط حبر كريمي سميك على شبكة سلك سكرين سوداء، والحافة الأمامية للحبر مقطوعة بخط مستقيم تمامًا" loading="lazy" fetchpriority="low" decoding="async" />
+          </picture>
+      </figure>
+      <div class="hero__shade" aria-hidden="true"></div>
+
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <p class="hero__badge">
+            <i aria-hidden="true"></i>
+            التسليم
+          </p>
+
+          <h2 class="hero__title hero__title--h2">
+            <span class="l1">من التيشيرت</span>
+            <span class="l2">لليافطة</span>
+          </h2>
+
+          <p class="hero__lede">
+            تيشيرتات، يونيفورم مدارس، أعلام، زجاج، وكرتون — <b>بالفاتورة والمواعيد</b>.
+            تسليم في الشرقية بإيدنا، وشحن لكل المحافظات.
+          </p>
+
+          <div class="hero__cta">
+            <a class="btn btn--primary btn--lg" href="https://wa.me/201000000000?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D9%83%D9%85%D8%A7%D9%84%20%D8%AC%D8%A7%D8%AF%D9%88%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%B9%D8%B1%D9%81%20%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B3%D9%84%D9%83%20%D8%B3%D9%83%D8%B1%D9%8A%D9%86" target="_blank" rel="noopener" data-cta="hero-whatsapp-2">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1s-.5-.2-.7.1-.8 1-1 1.2-.4.2-.7.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.5-.6.3-.5v-.5l-1-2.3c-.2-.5-.4-.5-.6-.5h-.6c-.2 0-.5.1-.8.4a3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 12.7 12.7 0 0 0 4.9 4.3 8.6 8.6 0 0 0 3.3.9 2.9 2.9 0 0 0 2.2-.8 2.6 2.6 0 0 0 .6-1.8c0-.2 0-.4-.2-.5M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2"/></svg>
+              واتساب فورًا
+            </a>
+            <a class="btn btn--ghost btn--lg" href="#services">كل الخدمات</a>
+          </div>
+
+          <dl class="hero__stats">
+            <div class="hero__stat"><dt>تسليم الشرقية</dt><dd>بإيدنا<small>يد</small></dd></div>
+            <div class="hero__stat"><dt>باقي المحافظات</dt><dd>شحن<small>مؤمَّن</small></dd></div>
+            <div class="hero__stat"><dt>أقل كمية</dt><dd>٢٥<small>قطعة</small></dd></div>
+          </dl>
+        </div>
+      </div>
+    </article>
+
   </div>
+
+  <button class="hero__arrow hero__arrow--prev" type="button" data-rail-prev aria-label="السلايد السابق">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <button class="hero__arrow hero__arrow--next" type="button" data-rail-next aria-label="السلايد التالي">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+  </button>
+
+  <nav class="hero__dots" data-rail-dots aria-label="اختيار السلايد">
+    <button type="button" class="is-active" data-goto="0" aria-label="السلايد ١" aria-current="true"><span aria-hidden="true"></span></button>
+    <button type="button" data-goto="1" aria-label="السلايد ٢"><span aria-hidden="true"></span></button>
+    <button type="button" data-goto="2" aria-label="السلايد ٣"><span aria-hidden="true"></span></button>
+  </nav>
+
+  <p class="hero__scroll" aria-hidden="true">
+    اسكرول لتحت — إنت بتنزل في الحبر
+    <i></i>
+  </p>
 </section>
 
 <!-- ======================== ٢. الخدمات ======================== -->
@@ -735,6 +829,7 @@
 
 <script src="/assets/js/kgs-ink.js" defer></script>
 <script src="/assets/js/kgs-engine.js" defer></script>
+<script src="/assets/js/kgs-hero.js" defer></script>
 <script src="/assets/js/kgs-page.js" defer></script>
 </body>
 </html>
