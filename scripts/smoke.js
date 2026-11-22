@@ -105,7 +105,48 @@ const vars = (doc, sel) => [...doc.querySelectorAll(sel)].map((el) => el.style.g
       continue;
     }
 
-    const sel = path === '/' ? '[data-reveal]' : '.reveal, .wipe, .rise';
+    /* ------------------------------------------------------------------
+       Production page: the light motion layer has no per-frame --p values.
+       It reveals once (IntersectionObserver, or the no-IO fallback) and the
+       only scroll-linked numbers are the top progress bar and the depth
+       readout. Assert those are monotonic, in range, Arabic, and reversible.
+       ------------------------------------------------------------------ */
+    if (path === '/') {
+      const reveals = [...doc.querySelectorAll('[data-reveal]')];
+      const staggered = reveals.every((el) => {
+        const v = Number(el.style.getPropertyValue('--i'));
+        return Number.isFinite(v) && v >= 0;
+      });
+      const revealed = reveals.filter((el) => el.classList.contains('is-in')).length;
+      const progress = doc.querySelector('[data-progress]');
+      const readout = doc.querySelector('[data-depth-readout]');
+      const dv = () => (progress ? progress.style.getPropertyValue('--d') : '');
+
+      scrollTo(win, 0);
+      await sleep(150);
+      const p0 = dv();
+      scrollTo(win, 5600);
+      await sleep(200);
+      const p1 = dv();
+      const v1 = readout ? readout.textContent : '';
+      scrollTo(win, 0);
+      await sleep(200);
+      const p2 = dv();
+
+      const okDepth = +p1 > +p0 && +p2 === +p0 && +p1 > 0 && +p1 <= 1;
+      const okArabic = /^[٠-٩]+$/.test(v1) && v1 !== '';
+      const okReveal = reveals.length > 20 && staggered && revealed > 0;
+      const ok = okDepth && okArabic && okReveal;
+      if (!ok) failed++;
+
+      results.push(
+        `${ok ? '✓' : '✗'} ${label} progress ${p0} → ${p1} → ${p2} · ` +
+          `depth "${v1}" arabic=${okArabic} · reveals ${revealed}/${reveals.length} staggered=${staggered}`
+      );
+      continue;
+    }
+
+    const sel = '.reveal, .wipe, .rise';
     scrollTo(win, 0);
     await sleep(120);
     const atTop = vars(doc, sel);
@@ -129,19 +170,6 @@ const vars = (doc, sel) => [...doc.querySelectorAll(sel)].map((el) => el.style.g
     const symmetric = mid1.every((v, i) => v === mid2[i]);
     const home = backTop.every((v, i) => v === atTop[i]);
     const ranged = [...mid1, ...deep].every((v) => v !== '' && +v >= -0.001 && +v <= 1.001);
-
-    // meters must stay a valid percentage
-    // production page: depth readout must be Arabic-Indic and in range,
-    // and the WebGL fallback must have kicked in without breaking the page
-    if (path === '/') {
-      const readout = doc.querySelector('[data-depth-readout]');
-      const v = readout ? readout.textContent : '';
-      const arabicOk = /^[٠-٩]+$/.test(v);
-      const fallback = doc.documentElement.classList.contains('ink-fallback');
-      const hasCanvasFallback = !doc.getElementById('ink-canvas') || doc.getElementById('ink-canvas').style.display === 'none' || fallback;
-      results.push(`      · depth readout "${v}" arabic=${arabicOk} · webgl fallback=${fallback} · canvas handled=${hasCanvasFallback}`);
-      if (!arabicOk && v !== '') failed++;
-    }
 
     const meterBad = [...doc.querySelectorAll('#inkLevel, #depthFill, #pageBar')].filter((m) => {
       const h = m.style.height || m.style.width;

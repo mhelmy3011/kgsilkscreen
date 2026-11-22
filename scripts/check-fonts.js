@@ -87,7 +87,7 @@ if (missing.length) {
 }
 
 // also assert the Arabic weights the page relies on are declared
-for (const w of ['400', '500', '700', '800', '900']) {
+for (const w of ['400', '700', '900']) {
   const has = faces.some((f) => f.family === 'Tajawal' && f.weight === w && f.ranges.some(([a]) => a === 0x0600));
   if (!has) console.log(`  ! Tajawal ${w} has no Arabic range declared`);
 }

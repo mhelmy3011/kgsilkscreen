@@ -4,7 +4,11 @@
 /**
  * `npm run images` — responsive image pipeline
  * ---------------------------------------------------------------------------
- * Source of truth: assets-src/img/*.png (generated, committed)
+ * Source of truth: assets-src/img/*.{png,jpg} (generated, committed)
+ *   · .png  — concept art / flat graphics
+ *   · .jpg  — photographic plates (the 2026 shoot). JPEG at q92 4:4:4 is the
+ *            master: it is 5x smaller than the PNG and is never palette-reduced,
+ *            because 256 colours visibly band a photograph at this size.
  * Output:          public/assets/img/<name>-<width>.{avif,webp,jpg}
  *
  * Why this shape:
@@ -57,7 +61,7 @@ if (!fs.existsSync(SRC)) {
 }
 fs.mkdirSync(OUT, { recursive: true });
 
-const sources = fs.readdirSync(SRC).filter((f) => f.endsWith('.png')).sort();
+const sources = fs.readdirSync(SRC).filter((f) => /\.(png|jpe?g)$/i.test(f)).sort();
 const kb = (b) => `${(b / 1024).toFixed(0)} KB`;
 
 let made = 0;
@@ -65,7 +69,7 @@ let after = 0;
 const manifest = {};
 
 for (const file of sources) {
-  const name = path.basename(file, '.png');
+  const name = path.basename(file, path.extname(file));
   const src = path.join(SRC, file);
   const [w, h] = execFileSync('identify', ['-format', '%w %h', src])
     .toString()
@@ -145,6 +149,7 @@ fs.mkdirSync(ARCHIVE, { recursive: true });
 let saved = 0;
 let touched = 0;
 for (const file of sources) {
+  if (!/\.png$/i.test(file)) continue;   // photographic JPEGs are already masters
   const src = path.join(SRC, file);
   const before = fs.statSync(src).size;
   if (before < 600 * 1024) continue;      // already small enough

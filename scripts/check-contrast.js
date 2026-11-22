@@ -78,31 +78,40 @@ function ratio(fg, bg) {
 }
 
 /* ---------- the pairs that actually appear ---------- */
-const PAGE = colour(tokens['--ink-1']);
+/* Light "paper" system: surfaces are paper-*, text is ink-*.
+   The hero copy sits on opaque paper (the artwork is a framed card in its own
+   grid area), so these token pairs are the real worst case everywhere. */
+const PAGE = colour(tokens['--paper-0']);
+const RAISED = colour(tokens['--paper-2']);
+const TINT = colour(tokens['--paper-3']);
 const DEEP = colour(tokens['--ink-0']);
-const RAISED = colour(tokens['--ink-2']);
 
 const TEXT = [
-  ['--paper on page', tokens['--paper'], PAGE, 4.5],
-  ['--paper on raised', tokens['--paper'], RAISED, 4.5],
-  ['--paper-dim on page', tokens['--paper-dim'], PAGE, 4.5],
-  ['--paper-dim on raised', tokens['--paper-dim'], RAISED, 4.5],
-  ['--paper-mute on page', tokens['--paper-mute'], PAGE, 4.5],
-  ['--paper-mute on raised', tokens['--paper-mute'], RAISED, 4.5],
-  ['--paper on deep', tokens['--paper'], DEEP, 4.5],
-  ['--paper-dim on deep', tokens['--paper-dim'], DEEP, 4.5],
+  ['--ink-0 on page paper', tokens['--ink-0'], PAGE, 4.5],
+  ['--ink-0 on raised card', tokens['--ink-0'], RAISED, 4.5],
+  ['--ink-1 on page paper', tokens['--ink-1'], PAGE, 4.5],
+  ['--ink-1 on raised card', tokens['--ink-1'], RAISED, 4.5],
+  ['--ink-2 on page paper', tokens['--ink-2'], PAGE, 4.5],
+  ['--ink-2 on raised card', tokens['--ink-2'], RAISED, 4.5],
+  ['--ink-2 on tint strip', tokens['--ink-2'], TINT, 4.5],
   ['--pigment on page (accent headline)', tokens['--pigment'], PAGE, 3.0],
-  ['--pigment-soft on page', tokens['--pigment-soft'], PAGE, 4.5],
-  ['--cyan-soft on page (eyebrows)', tokens['--cyan-soft'], PAGE, 4.5],
-  ['--cyan-soft on raised', tokens['--cyan-soft'], RAISED, 4.5],
-  // the quote-builder selected pill text
-  ['selected pill text #ffd2bd on pigment wash', '#ffd2bd', { r: 40, g: 18, b: 12, a: 1 }, 4.5],
+  ['--pigment-deep on page (small accent)', tokens['--pigment-deep'], PAGE, 4.5],
+  ['--teal on page (price / eyebrow)', tokens['--teal'], PAGE, 4.5],
+  ['--teal on raised card', tokens['--teal'], RAISED, 4.5],
+  ['--gold on page', tokens['--gold'], PAGE, 4.5],
+  // the ink conversion panel is part of a light page; its copy must still pass
+  ['#f4ede4 on --ink-0 panel', '#f4ede4', DEEP, 4.5],
+  ['#ded4c8 on --ink-0 panel', '#ded4c8', DEEP, 4.5],
+  ['#c8bcab on --ink-0 panel (qb summary)', '#c8bcab', DEEP, 4.5],
+  // the selected quote-builder pill
+  ['selected pill text #fffaf6 on pigment', '#fffaf6', colour(tokens['--pigment']), 4.5],
 ];
 
 const NON_TEXT = [
-  ['--line-strong as a boundary', tokens['--line-strong'], PAGE, 3.0],
-  ['focus ring (--cyan-soft) on page', tokens['--cyan-soft'], PAGE, 3.0],
-  ['WhatsApp green icon on its own bubble', '#04120a', colour('#25d366'), 3.0],
+  ['--line-strong as a boundary on page', tokens['--line-strong'], PAGE, 3.0],
+  ['--line-strong as a boundary on card', tokens['--line-strong'], RAISED, 3.0],
+  ['focus ring (--teal) on page', tokens['--teal'], PAGE, 3.0],
+  ['WhatsApp glyph on its own bubble', '#ffffff', colour('#1f9d63'), 3.0],
 ];
 
 let fail = 0;

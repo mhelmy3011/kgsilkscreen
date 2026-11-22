@@ -15,3 +15,6 @@ public/_ssg/
 public/assets/fonts/*.ttf
 assets-src/og.html
 assets-src/img/thumb-*.jpg
+
+# python bytecode from the build-time SVG/OG tooling
+__pycache__/
